@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>コエカキ</title>
+<meta name="description" content="話した言葉をその場で文字にする、スマホ用の文字起こしアプリ">
+<meta name="theme-color" content="#F3F4EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121614" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="コエカキ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
+<style>
+:root{
+  --paper:#F3F4EE; --sheet:#FBFBF7; --ink:#1E2320; --ink-2:#56605A; --ink-3:#949C96;
+  --rule:#DCE4D8; --line:#E0E4DC; --accent:#2E6B58; --accent-soft:#DDEBE4; --accent-ink:#FFFFFF;
+  --rec:#CF3B2B; --rec-soft:rgba(207,59,43,.18); --warn-bg:#FBEFD9; --warn-ink:#7A4B0C;
+  --shadow:0 8px 28px rgba(30,45,38,.16);
+  --lh:2rem;
+  --font:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121614; --sheet:#171C19; --ink:#E4E8E2; --ink-2:#A6B0A9; --ink-3:#69736D;
+    --rule:#243029; --line:#2A332E; --accent:#7CC4AA; --accent-soft:#1F3A30; --accent-ink:#0E1A15;
+    --rec:#FF6A57; --rec-soft:rgba(255,106,87,.22); --warn-bg:#3A2C14; --warn-ink:#F2CD8A;
+    --shadow:0 8px 28px rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121614; --sheet:#171C19; --ink:#E4E8E2; --ink-2:#A6B0A9; --ink-3:#69736D;
+  --rule:#243029; --line:#2A332E; --accent:#7CC4AA; --accent-soft:#1F3A30; --accent-ink:#0E1A15;
+  --rec:#FF6A57; --rec-soft:rgba(255,106,87,.22); --warn-bg:#3A2C14; --warn-ink:#F2CD8A;
+  --shadow:0 8px 28px rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--font); font-size:16px;
+  -webkit-tap-highlight-color:transparent; -webkit-text-size-adjust:100%;
+  display:grid; grid-template-rows:auto 1fr auto; height:100dvh; overflow:hidden;
+}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* ヘッダー */
+.top{
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 8px;
+  display:grid; gap:4px; border-bottom:1px solid var(--line); background:var(--paper);
+}
+.top-row{display:flex;align-items:center;gap:4px}
+.title{
+  flex:1; min-width:0; border:0; background:transparent; font-weight:700; font-size:1.125rem;
+  padding:6px 4px; border-radius:8px; text-overflow:ellipsis;
+}
+.title::placeholder{color:var(--ink-3);font-weight:700}
+.title:focus{background:var(--sheet);outline:none;box-shadow:inset 0 0 0 1.5px var(--accent)}
+.icon-btn{
+  width:44px;height:44px;flex:none;display:grid;place-items:center;border:0;background:transparent;
+  border-radius:12px;color:var(--ink-2);
+}
+.icon-btn:hover{background:var(--accent-soft);color:var(--ink)}
+.icon-btn:disabled{opacity:.35;pointer-events:none}
+.icon-btn svg{width:24px;height:24px}
+.stats{
+  font-size:.8125rem; color:var(--ink-2); padding:0 4px; display:flex; flex-wrap:wrap; gap:0 .9em;
+  font-variant-numeric:tabular-nums;
+}
+.stats b{color:var(--ink);font-weight:700}
+
+/* 原稿 */
+main{overflow-y:auto; overscroll-behavior:contain; padding:16px 16px 24px}
+.notice{
+  background:var(--warn-bg); color:var(--warn-ink); border-radius:12px; padding:12px 14px;
+  font-size:.875rem; line-height:1.6; margin:0 auto 16px; max-width:40rem;
+}
+.sheet{
+  max-width:40rem; margin:0 auto; min-height:calc(var(--lh) * 8);
+  background-color:var(--sheet);
+  background-image:repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--lh) - 1px), var(--rule) calc(var(--lh) - 1px), var(--rule) var(--lh));
+  background-position:0 12px;
+  border-radius:4px; padding:12px 16px; box-shadow:0 0 0 1px var(--line);
+  line-height:var(--lh);
+}
+.seg{margin:0; overflow-wrap:anywhere}
+.seg time{
+  font-family:var(--mono); font-size:.75rem; color:var(--accent); margin-right:.6em;
+  font-variant-numeric:tabular-nums; user-select:none; -webkit-user-select:none;
+}
+.sheet.no-time .seg time{display:none}
+.seg .tx{outline:none; border-radius:3px}
+.seg .tx:focus{background:var(--accent-soft)}
+.seg.interim{color:var(--ink-3)}
+.seg.interim::after{
+  content:""; display:inline-block; width:2px; height:1.1em; background:var(--accent);
+  vertical-align:-.2em; margin-left:2px; animation:blink 1s steps(1) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+.empty{color:var(--ink-3); margin:0}
+.empty strong{color:var(--ink-2)}
+
+/* 下部バー */
+.dock{
+  border-top:1px solid var(--line); background:var(--paper);
+  padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px;
+}
+.side-btn{
+  justify-self:center; display:grid; justify-items:center; gap:2px; border:0; background:transparent;
+  color:var(--ink-2); font-size:.75rem; padding:6px 10px; border-radius:12px; min-width:64px;
+}
+.side-btn svg{width:26px;height:26px}
+.side-btn:hover{background:var(--accent-soft);color:var(--ink)}
+.side-btn:disabled{opacity:.35;pointer-events:none}
+.rec-wrap{display:grid;justify-items:center;gap:6px}
+.clock{font-family:var(--mono);font-size:.9375rem;font-variant-numeric:tabular-nums;color:var(--ink-2);letter-spacing:.04em}
+.rec{
+  width:76px;height:76px;border-radius:50%;border:3px solid var(--accent);background:var(--sheet);
+  display:grid;place-items:center;position:relative;transition:transform .12s ease;
+}
+.rec:active{transform:scale(.95)}
+.rec::before{content:"";width:30px;height:30px;border-radius:50%;background:var(--rec);transition:all .18s ease}
+.rec[aria-pressed="true"]{border-color:var(--rec);background:var(--rec-soft)}
+.rec[aria-pressed="true"]::before{width:26px;height:26px;border-radius:6px}
+.rec[aria-pressed="true"]::after{
+  content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--rec);
+  animation:ring 1.6s ease-out infinite;
+}
+@keyframes ring{from{opacity:.7;transform:scale(.9)}to{opacity:0;transform:scale(1.18)}}
+.rec:disabled{opacity:.4;pointer-events:none}
+.state{font-size:.75rem;color:var(--ink-3);min-height:1.1em}
+.state.live{color:var(--rec);font-weight:700}
+
+/* シート（履歴・設定） */
+.scrim{position:fixed;inset:0;background:rgba(10,16,13,.42);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.panel{
+  width:100%;max-width:40rem;max-height:82dvh;overflow-y:auto;background:var(--paper);
+  border-radius:20px 20px 0 0;box-shadow:var(--shadow);
+  padding:8px 16px calc(env(safe-area-inset-bottom,0px) + 20px);
+}
+.grip{width:40px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 10px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.panel h2{font-size:1.0625rem;margin:0}
+.list{list-style:none;margin:0;padding:0;display:grid}
+.list li{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.open{flex:1;min-width:0;text-align:left;border:0;background:transparent;padding:12px 4px;display:grid;gap:2px;border-radius:8px}
+.open:hover{background:var(--accent-soft)}
+.open .n{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.open .m{font-size:.8125rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tag{font-size:.6875rem;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;font-weight:700}
+.del{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:.8125rem;color:var(--ink-2);white-space:nowrap}
+.del.armed{background:var(--rec);border-color:var(--rec);color:#fff}
+.none{color:var(--ink-3);padding:16px 4px;margin:0}
+
+.field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.field label{font-weight:700}
+.field small{display:block;font-weight:400;color:var(--ink-2);font-size:.8125rem;line-height:1.5;margin-top:2px}
+.field select{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:8px 10px;max-width:55%}
+.switch{appearance:none;-webkit-appearance:none;width:48px;height:28px;border-radius:999px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .15s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.switch:checked{background:var(--accent)}
+.switch:checked::after{transform:translateX(20px)}
+.wide-btn{width:100%;margin-top:16px;border:0;border-radius:12px;padding:14px;background:var(--accent);color:var(--accent-ink);font-weight:700}
+.fine{font-size:.8125rem;color:var(--ink-2);line-height:1.7;margin:16px 0 0}
+.fine:empty{display:none}
+.fine.err{color:var(--rec);font-weight:700}
+.lead{font-size:.9375rem;line-height:1.7;margin:0 0 12px;color:var(--ink-2)}
+.field.col{flex-direction:column;align-items:stretch;gap:8px}
+.field a{color:var(--accent)}
+.key{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:.875rem;width:100%}
+.steps{margin:0;padding-left:1.4em;line-height:1.8;font-size:.9375rem;display:grid;gap:6px}
+.steps small{display:block;color:var(--ink-2);font-size:.8125rem;line-height:1.5}
+.prog-msg{font-size:.9375rem;margin:4px 0 0;font-weight:700}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:14px 0 8px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.prog-sub{font-size:.8125rem;color:var(--ink-2);margin:0;line-height:1.6}
+.ghost-btn{width:100%;margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:12px;background:transparent;color:var(--ink-2)}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 140px);
+  background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-size:.875rem;
+  box-shadow:var(--shadow);z-index:20;max-width:calc(100% - 32px);width:max-content;text-align:center;line-height:1.5;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .rec[aria-pressed="true"]::after,.seg.interim::after{animation:none}
+  .rec,.rec::before,.switch,.switch::after{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <input id="title" class="title" type="text" autocomplete="off" enterkeyhint="done" aria-label="タイトル">
+    <button id="btnNew" class="icon-btn" type="button" aria-label="新しい記録">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg>
+    </button>
+    <button id="btnImport" class="icon-btn" type="button" aria-label="録音ファイルから文字起こし">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8"/><path d="M14 3v5h5M9 13.5v3M12 11.5v7M15 13.5v3"/></svg>
+    </button>
+    <button id="btnHistory" class="icon-btn" type="button" aria-label="これまでの記録">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </button>
+    <button id="btnSettings" class="icon-btn" type="button" aria-label="設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+    </button>
+  </div>
+  <div id="stats" class="stats" aria-live="off"></div>
+</header>
+
+<main id="scroller">
+  <div id="notice" class="notice" hidden></div>
+  <div id="sheet" class="sheet" aria-label="文字起こし"></div>
+</main>
+
+<footer class="dock">
+  <button id="btnCopy" class="side-btn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>
+    コピー
+  </button>
+  <div class="rec-wrap">
+    <div id="clock" class="clock">0:00</div>
+    <button id="btnRec" class="rec" type="button" aria-pressed="false" aria-label="録音を始める"></button>
+    <div id="state" class="state" aria-live="polite">タップして話す</div>
+  </div>
+  <button id="btnShare" class="side-btn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5"/><path d="M6 11H5a1 1 0 0 0-1 1v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a1 1 0 0 0-1-1h-1"/></svg>
+    共有
+  </button>
+</footer>
+
+<div id="historySheet" class="scrim" hidden>
+  <section class="panel" role="dialog" aria-modal="true" aria-labelledby="hTitle">
+    <div class="grip"></div>
+    <div class="panel-head">
+      <h2 id="hTitle">これまでの記録</h2>
+      <button class="icon-btn" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <ul id="historyList" class="list"></ul>
+  </section>
+</div>
+
+<div id="settingsSheet" class="scrim" hidden>
+  <section class="panel" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+    <div class="grip"></div>
+    <div class="panel-head">
+      <h2 id="sTitle">設定</h2>
+      <button class="icon-btn" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="field">
+      <label for="optLang">話す言語</label>
+      <select id="optLang">
+        <option value="ja-JP">日本語</option>
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="zh-CN">中文（普通话）</option>
+        <option value="zh-TW">中文（台灣）</option>
+        <option value="ko-KR">한국어</option>
+        <option value="es-ES">Español</option>
+        <option value="fr-FR">Français</option>
+        <option value="de-DE">Deutsch</option>
+        <option value="pt-BR">Português</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="optPeriod">文末に句点を付ける<small>区切りごとに「。」を自動で補います</small></label>
+      <input id="optPeriod" class="switch" type="checkbox" role="switch">
+    </div>
+    <div class="field">
+      <label for="optTime">経過時間を表示<small>コピー・共有するテキストにも [0:12] の形で入ります</small></label>
+      <input id="optTime" class="switch" type="checkbox" role="switch">
+    </div>
+    <div class="field col">
+      <label for="optKey">Groq の APIキー<small>録音ファイルの文字起こしに使います。1日8時間分まで無料です。<a href="https://console.groq.com/keys" target="_blank" rel="noopener">キーを発行する（無料登録）</a></small></label>
+      <input id="optKey" class="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="gsk_で始まる文字列">
+    </div>
+    <button id="btnDownload" class="wide-btn" type="button">テキストファイルで保存</button>
+    <p class="fine">
+      その場の文字起こしにはブラウザ標準の機能を使います（Android は Google、iPhone は Apple のサーバーで処理されます）。録音ファイルの文字起こしでは音声が Groq に送られます。書き起こした文字と APIキーはこの端末の中だけに保存されます。<br>
+      その場の文字起こしは、画面が消えたり別のアプリに切り替えたりすると止まります。画面を消して録りたいときは「ボイスメモ」で録音して、録音ファイルから文字起こししてください。
+    </p>
+  </section>
+</div>
+
+<div id="importSheet" class="scrim" hidden>
+  <section class="panel" role="dialog" aria-modal="true" aria-labelledby="iTitle">
+    <div class="grip"></div>
+    <div class="panel-head">
+      <h2 id="iTitle">録音ファイルから文字起こし</h2>
+      <button class="icon-btn" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div id="importIntro">
+      <p class="lead">画面を消したまま録りたいときは、iPhone の「ボイスメモ」で録音して、あとからここで文字にします。</p>
+      <ol class="steps">
+        <li>「ボイスメモ」で録音する<small>画面を消しても録音は続きます</small></li>
+        <li>録音の「…」→「共有」→「"ファイル"に保存」</li>
+        <li>下のボタンから、保存したファイルを選ぶ</li>
+      </ol>
+      <button id="btnPick" class="wide-btn" type="button">ファイルを選ぶ</button>
+      <p id="importNote" class="fine" aria-live="polite"></p>
+    </div>
+    <div id="importProg" hidden>
+      <p id="progMsg" class="prog-msg" aria-live="polite"></p>
+      <div class="bar"><i id="progBar"></i></div>
+      <p class="prog-sub">終わるまで画面をつけたままにしてください。1時間の録音でも数分で終わります。</p>
+      <button id="btnCancel" class="ghost-btn" type="button">中止</button>
+    </div>
+  </section>
+</div>
+<input id="fileIn" type="file" accept="audio/*,.m4a,.mp3,.wav,.aac,.ogg,.webm,.flac,.mp4" hidden>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+(() => {
+'use strict';
+
+const $ = s => document.querySelector(s);
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const UA = navigator.userAgent;
+const IS_ANDROID = /Android/i.test(UA);
+const IN_APP = /\bLine\/|FBAN|FBAV|Instagram|Twitter/i.test(UA);
+const K_DATA = 'koekaki.sessions.v1';
+const K_PREFS = 'koekaki.prefs.v1';
+const CJK = '　-ヿ㐀-鿿＀-￯';
+const CJK_GAP = new RegExp('([' + CJK + '])\\s+(?=[' + CJK + '])', 'g');
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+};
+
+const prefs = Object.assign({ lang: 'ja-JP', autoPeriod: true, showTime: true, groqKey: '' }, store.get(K_PREFS, {}));
+let sessions = store.get(K_DATA, []);
+let cur = sessions[0] || blank();
+
+const el = {
+  title: $('#title'), stats: $('#stats'), scroller: $('#scroller'), sheet: $('#sheet'), notice: $('#notice'),
+  clock: $('#clock'), rec: $('#btnRec'), state: $('#state'), copy: $('#btnCopy'), share: $('#btnShare'),
+  newBtn: $('#btnNew'), histBtn: $('#btnHistory'), setBtn: $('#btnSettings'),
+  hist: $('#historySheet'), histList: $('#historyList'), settings: $('#settingsSheet'),
+  lang: $('#optLang'), period: $('#optPeriod'), time: $('#optTime'), download: $('#btnDownload'), toast: $('#toast'),
+  key: $('#optKey'), importBtn: $('#btnImport'), imp: $('#importSheet'), impIntro: $('#importIntro'), impProg: $('#importProg'),
+  impNote: $('#importNote'), pick: $('#btnPick'), file: $('#fileIn'), progMsg: $('#progMsg'), progBar: $('#progBar'), cancel: $('#btnCancel'),
+};
+
+/* ---------- データ ---------- */
+function blank() {
+  return { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: '', createdAt: Date.now(), updatedAt: Date.now(), lang: prefs.lang, duration: 0, segs: [] };
+}
+function listed(s) { return sessions.includes(s); }
+function ensureListed() { if (!listed(cur)) sessions.unshift(cur); }
+
+let saveTimer = 0, dirty = false;
+function scheduleSave() { dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
+function saveNow() {
+  clearTimeout(saveTimer);
+  if (!dirty) return;
+  dirty = false;
+  sessions = sessions.filter(s => s.segs.length || s.title.trim());
+  sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+  if (!store.set(K_DATA, sessions)) toast('保存できませんでした。端末の空き容量を確認してください');
+}
+function savePrefs() { store.set(K_PREFS, prefs); }
+
+/* ---------- 表示用 ---------- */
+function fmtClock(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0');
+}
+function fmtDate(ts) {
+  const d = new Date(ts);
+  return `${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+function defaultTitle(s) { return fmtDate(s.createdAt) + ' の記録'; }
+function titleOf(s) { return s.title.trim() || (s.segs[0] ? s.segs[0].text.slice(0, 24) : defaultTitle(s)); }
+function charCount(s) { return s.segs.reduce((n, g) => n + Array.from(g.text).length, 0); }
+const nf = new Intl.NumberFormat('ja-JP');
+
+function exportText(s = cur) {
+  return s.segs.map(g => (prefs.showTime ? `[${fmtClock(g.t)}] ` : '') + g.text).join('\n');
+}
+
+/* ---------- 描画 ---------- */
+let interimEl = null;
+
+function segEl(g, i) {
+  const p = document.createElement('p');
+  p.className = 'seg'; p.dataset.i = i;
+  const t = document.createElement('time'); t.textContent = fmtClock(g.t);
+  const x = document.createElement('span'); x.className = 'tx'; x.textContent = g.text;
+  x.contentEditable = 'plaintext-only';
+  if (x.contentEditable !== 'plaintext-only') x.contentEditable = 'true';
+  x.spellcheck = false; x.enterKeyHint = 'done';
+  p.append(t, x);
+  return p;
+}
+
+function renderSheet() {
+  el.sheet.textContent = '';
+  el.sheet.classList.toggle('no-time', !prefs.showTime);
+  if (!cur.segs.length) {
+    const e = document.createElement('p'); e.className = 'empty';
+    e.innerHTML = '<strong>下の丸いボタンを押して話してください。</strong><br>話した言葉がこの紙に一行ずつ書き込まれます。<br>書き込まれた文字はタップして直せます。<br>画面を消して長く録るときは、ボイスメモで録音して上の<strong>録音ファイル</strong>ボタンから読み込めます。';
+    el.sheet.append(e);
+  }
+  cur.segs.forEach((g, i) => el.sheet.append(segEl(g, i)));
+  interimEl = document.createElement('p');
+  interimEl.className = 'seg interim'; interimEl.hidden = true;
+  el.sheet.append(interimEl);
+}
+
+function renderHeader() {
+  el.title.value = cur.title;
+  el.title.placeholder = defaultTitle(cur);
+  renderStats();
+}
+
+function renderStats() {
+  const n = charCount(cur);
+  el.stats.innerHTML = `<span><b>${nf.format(n)}</b> 字</span><span>原稿用紙 <b>${(n / 400).toFixed(1)}</b> 枚</span><span><b>${cur.segs.length}</b> 行</span>`;
+}
+
+function renderAll() { renderHeader(); renderSheet(); renderClock(); renderRecState(); }
+
+function nearBottom() { const s = el.scroller; return s.scrollHeight - s.scrollTop - s.clientHeight < 96; }
+function stickBottom(was) { if (was) el.scroller.scrollTop = el.scroller.scrollHeight; }
+
+/* ---------- 音声認識 ---------- */
+let recording = false, takeStart = 0, rec = null, interim = '', uttT = null;
+let quickFails = 0, fatal = '', netWait = false;
+
+const elapsed = () => cur.duration + (recording ? (Date.now() - takeStart) / 1000 : 0);
+
+function tidy(raw, lang, addPeriod = prefs.autoPeriod) {
+  let t = raw.replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  if (/^(ja|zh)/.test(lang)) t = t.replace(CJK_GAP, '$1');
+  if (addPeriod) {
+    if (lang.startsWith('ja')) { if (!/[。．.！？!?、…」』）)]$/.test(t)) t += '。'; }
+    else if (lang.startsWith('zh')) { if (!/[。．！？!?，…」』）)]$/.test(t)) t += '。'; }
+    else if (/[\p{L}\p{N}]$/u.test(t)) t += '.';
+  }
+  return t;
+}
+
+function commit(raw) {
+  const text = tidy(raw, cur.lang || prefs.lang);
+  if (!text) return;
+  const was = nearBottom();
+  const g = { t: uttT ?? elapsed(), text };
+  uttT = null;
+  if (!cur.segs.length) el.sheet.querySelector('.empty')?.remove();
+  cur.segs.push(g);
+  cur.updatedAt = Date.now();
+  ensureListed();
+  el.sheet.insertBefore(segEl(g, cur.segs.length - 1), interimEl);
+  renderStats();
+  stickBottom(was);
+  scheduleSave();
+}
+
+function setInterim(t) {
+  interim = t;
+  if (t && uttT == null) uttT = elapsed();
+  const was = nearBottom();
+  interimEl.textContent = t;
+  interimEl.hidden = !t;
+  stickBottom(was);
+}
+
+function startEngine() {
+  const r = new SR();
+  r.lang = prefs.lang;
+  r.interimResults = true;
+  // Android版Chromeは continuous=true だと結果が重複するため、1発話ごとに再起動する
+  r.continuous = !IS_ANDROID;
+  r.maxAlternatives = 1;
+  let committed = -1, heard = false;
+  const startedAt = Date.now();
+
+  r.onresult = e => {
+    heard = true; quickFails = 0;
+    if (netWait) { netWait = false; renderRecState(); }
+    let im = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      if (res.isFinal) { if (i > committed) { committed = i; setInterim(''); commit(res[0].transcript); } }
+      else im += res[0].transcript;
+    }
+    setInterim(im);
+  };
+  r.onerror = e => {
+    switch (e.error) {
+      case 'no-speech': case 'aborted': break;
+      case 'not-allowed': case 'service-not-allowed':
+        fatal = 'マイクが許可されていません。ブラウザの設定でこのサイトのマイクを「許可」にしてください'; break;
+      case 'audio-capture': fatal = 'マイクが見つかりません。ほかのアプリがマイクを使っていないか確認してください'; break;
+      case 'language-not-supported': fatal = 'この言語はこの端末では認識できません。設定で言語を変えてください'; break;
+      case 'network': netWait = true; renderRecState(); break;
+    }
+  };
+  r.onend = () => {
+    if (interim.trim()) { const t = interim; setInterim(''); commit(t); }
+    else setInterim('');
+    if (rec !== r) return;
+    rec = null;
+    if (!recording) return;
+    if (fatal) { const m = fatal; fatal = ''; stopRecording(m); return; }
+    const quick = !heard && Date.now() - startedAt < 1500;
+    quickFails = quick ? quickFails + 1 : 0;
+    if (quickFails >= 6) { stopRecording(netWait ? '音声認識につながりません。通信状態を確認してください' : '音声認識が止まってしまいました。もう一度ボタンを押してください'); return; }
+    setTimeout(() => { if (recording && !rec) startEngine(); }, quick ? 300 * quickFails : 60);
+  };
+
+  rec = r;
+  try { r.start(); } catch { rec = null; setTimeout(() => { if (recording && !rec) startEngine(); }, 300); }
+}
+
+function startRecording() {
+  if (!SR || recording) return;
+  if (cur.segs.length && cur.lang !== prefs.lang) cur.lang = prefs.lang;
+  if (!cur.segs.length) cur.lang = prefs.lang;
+  recording = true; takeStart = Date.now(); quickFails = 0; fatal = ''; netWait = false;
+  startEngine();
+  requestWake();
+  renderRecState();
+}
+
+function stopRecording(msg) {
+  if (!recording) return;
+  cur.duration += (Date.now() - takeStart) / 1000;
+  recording = false;
+  const r = rec;
+  if (r) { try { r.stop(); } catch {} }
+  releaseWake();
+  renderRecState(); renderClock();
+  if (cur.segs.length) { cur.updatedAt = Date.now(); ensureListed(); }
+  dirty = true; saveNow();
+  if (msg) toast(msg);
+}
+
+function renderRecState() {
+  el.rec.setAttribute('aria-pressed', String(recording));
+  el.rec.setAttribute('aria-label', recording ? '録音を止める' : '録音を始める');
+  el.state.classList.toggle('live', recording && !netWait);
+  el.state.textContent = !SR ? '使用できません' : recording ? (netWait ? '通信を待っています…' : '● 聞き取り中') : 'タップして話す';
+  for (const b of [el.newBtn, el.histBtn, el.importBtn]) b.disabled = recording;
+  el.lang.disabled = recording;
+}
+
+function renderClock() { el.clock.textContent = fmtClock(elapsed()); }
+setInterval(() => { if (recording) renderClock(); }, 250);
+
+/* 画面の自動消灯を防ぐ */
+let wake = null;
+async function requestWake() { try { wake = await navigator.wakeLock?.request('screen'); } catch { wake = null; } }
+function releaseWake() { try { wake?.release(); } catch {} wake = null; }
+let stoppedInBackground = false;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (recording) { stopRecording(); stoppedInBackground = true; }
+    saveNow();
+  } else if (stoppedInBackground) {
+    stoppedInBackground = false;
+    toast('画面が切り替わったので止めました。画面を消して録るときはボイスメモで録音して、ファイルから文字起こししてください');
+  }
+});
+window.addEventListener('pagehide', saveNow);
+
+/* ---------- 編集 ---------- */
+el.sheet.addEventListener('input', e => {
+  const x = e.target.closest('.tx'); if (!x) return;
+  const i = +x.parentElement.dataset.i;
+  if (!cur.segs[i]) return;
+  cur.segs[i].text = x.textContent.replace(/\n/g, ' ');
+  cur.updatedAt = Date.now();
+  renderStats(); scheduleSave();
+});
+el.sheet.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.closest('.tx') && !e.isComposing) { e.preventDefault(); e.target.blur(); }
+});
+el.sheet.addEventListener('focusout', e => {
+  const x = e.target.closest('.tx'); if (!x) return;
+  const i = +x.parentElement.dataset.i;
+  if (cur.segs[i] && !cur.segs[i].text.trim()) {
+    cur.segs.splice(i, 1);
+    const top = el.scroller.scrollTop;
+    renderSheet(); renderStats(); el.scroller.scrollTop = top;
+    if (recording && interim) setInterim(interim);
+    scheduleSave();
+    toast('空になった行を消しました');
+  }
+});
+el.title.addEventListener('input', () => {
+  cur.title = el.title.value; cur.updatedAt = Date.now();
+  if (cur.title.trim()) ensureListed();
+  scheduleSave();
+});
+el.title.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) el.title.blur(); });
+
+/* ---------- ボタン ---------- */
+el.rec.addEventListener('click', () => recording ? stopRecording() : startRecording());
+
+el.newBtn.addEventListener('click', () => {
+  if (recording) return;
+  if (!cur.segs.length && !cur.title.trim()) { toast('いまの紙はまだ白紙です'); return; }
+  saveNow();
+  cur = blank();
+  renderAll();
+  toast('新しい紙を用意しました');
+});
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch {}
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;opacity:0';
+  document.body.append(ta); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch {}
+  ta.remove(); return ok;
+}
+el.copy.addEventListener('click', async () => {
+  const text = exportText();
+  if (!text) { toast('まだ文字がありません'); return; }
+  toast(await copyText(text) ? `${nf.format(charCount(cur))}字をコピーしました` : 'コピーできませんでした。文字を長押しして選択してください');
+});
+
+function fileName() { return titleOf(cur).replace(/[\\/:*?"<>|\n]/g, '_').slice(0, 40) + '.txt'; }
+function download() {
+  const text = exportText();
+  if (!text) { toast('まだ文字がありません'); return; }
+  const url = URL.createObjectURL(new Blob([text + '\n'], { type: 'text/plain;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = fileName();
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast('「' + a.download + '」を保存しました');
+}
+el.share.addEventListener('click', async () => {
+  const text = exportText();
+  if (!text) { toast('まだ文字がありません'); return; }
+  if (navigator.share) {
+    try { await navigator.share({ title: titleOf(cur), text }); return; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  download();
+});
+el.download.addEventListener('click', download);
+
+/* ---------- シート ---------- */
+function openSheet(s) { s.hidden = false; s.querySelector('[data-close]').focus(); }
+function closeSheet(s) { s.hidden = true; }
+for (const s of [el.hist, el.settings, el.imp]) {
+  s.addEventListener('click', e => {
+    if (s === el.imp && importing) return;
+    if (e.target === s || e.target.closest('[data-close]')) closeSheet(s);
+  });
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') for (const s of [el.hist, el.settings, el.imp]) if (!s.hidden && !(s === el.imp && importing)) closeSheet(s);
+});
+
+el.histBtn.addEventListener('click', () => { if (!recording) { saveNow(); renderHistory(); openSheet(el.hist); } });
+
+function renderHistory() {
+  el.histList.textContent = '';
+  if (!sessions.length) {
+    const p = document.createElement('p'); p.className = 'none';
+    p.textContent = 'まだ記録はありません。';
+    el.histList.append(p); return;
+  }
+  for (const s of sessions) {
+    const li = document.createElement('li');
+    const open = document.createElement('button'); open.type = 'button'; open.className = 'open';
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = titleOf(s);
+    if (s === cur) { const tg = document.createElement('span'); tg.className = 'tag'; tg.textContent = '表示中'; n.append(tg); }
+    const m = document.createElement('span'); m.className = 'm';
+    m.textContent = `${fmtDate(s.createdAt)} ・ ${nf.format(charCount(s))}字 ・ ${fmtClock(s.duration)}`;
+    open.append(n, m);
+    open.addEventListener('click', () => { cur = s; renderAll(); closeSheet(el.hist); el.scroller.scrollTop = 0; });
+
+    const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = '削除';
+    let armTimer = 0;
+    del.addEventListener('click', () => {
+      if (!del.classList.contains('armed')) {
+        del.classList.add('armed'); del.textContent = 'もう一度で削除';
+        armTimer = setTimeout(() => { del.classList.remove('armed'); del.textContent = '削除'; }, 3000);
+        return;
+      }
+      clearTimeout(armTimer);
+      sessions = sessions.filter(x => x !== s);
+      if (s === cur) { cur = sessions[0] || blank(); renderAll(); }
+      dirty = true; saveNow(); renderHistory();
+      toast('記録を削除しました');
+    });
+    li.append(open, del);
+    el.histList.append(li);
+  }
+}
+
+function openSettings() {
+  el.lang.value = prefs.lang; el.period.checked = prefs.autoPeriod; el.time.checked = prefs.showTime; el.key.value = prefs.groqKey;
+  openSheet(el.settings);
+}
+el.setBtn.addEventListener('click', openSettings);
+el.key.addEventListener('change', () => { prefs.groqKey = el.key.value.trim(); savePrefs(); });
+el.lang.addEventListener('change', () => { prefs.lang = el.lang.value; savePrefs(); });
+el.period.addEventListener('change', () => { prefs.autoPeriod = el.period.checked; savePrefs(); });
+el.time.addEventListener('change', () => { prefs.showTime = el.time.checked; savePrefs(); el.sheet.classList.toggle('no-time', !prefs.showTime); });
+
+/* ---------- 録音ファイルから文字起こし（Groq Whisper） ---------- */
+const GROQ_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+const SEND_MAX = 24 * 1024 * 1024;           // 無料枠の上限は25MB
+const SEND_EXT = /\.(m4a|mp3|mp4|mpeg|mpga|wav|ogg|webm|flac)$/i;
+const CHUNK_SEC = 600;                       // 大きいファイルは10分ずつに分けて送る
+let importing = null;
+
+function showImportIntro(note = '', isErr = false) {
+  el.impIntro.hidden = false; el.impProg.hidden = true;
+  el.impNote.textContent = note || (prefs.groqKey ? '' : '※ 先に「設定」で Groq の APIキー（無料）を入れておく必要があります。');
+  el.impNote.classList.toggle('err', isErr);
+}
+function progress(msg, frac) {
+  el.progMsg.textContent = msg;
+  if (frac != null) el.progBar.style.width = Math.round(frac * 100) + '%';
+}
+const sleep = (ms, signal) => new Promise((res, rej) => {
+  const t = setTimeout(res, ms);
+  signal?.addEventListener('abort', () => { clearTimeout(t); rej(new DOMException('中止', 'AbortError')); }, { once: true });
+});
+
+el.importBtn.addEventListener('click', () => { if (recording) return; showImportIntro(); openSheet(el.imp); });
+el.pick.addEventListener('click', () => {
+  if (!prefs.groqKey) { closeSheet(el.imp); openSettings(); el.key.focus(); toast('Groq の APIキーを入れてください'); return; }
+  el.file.value = ''; el.file.click();
+});
+el.file.addEventListener('change', () => { const f = el.file.files[0]; if (f) transcribeFile(f); });
+el.cancel.addEventListener('click', () => importing?.abort());
+
+// 音声を16kHzモノラルに変換して、10分ずつのWAVに切り分ける
+async function splitAudio(file) {
+  const buf = await file.arrayBuffer();
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const ctx = new OAC(1, 16000, 16000);
+  let audio;
+  try { audio = await new Promise((res, rej) => { const q = ctx.decodeAudioData(buf, res, rej); if (q && q.then) q.then(res, rej); }); }
+  catch { throw new Error('この形式の音声は読み込めません。m4a・mp3・wav のファイルを選んでください'); }
+  const n = audio.length, chs = audio.numberOfChannels, sr = audio.sampleRate;
+  let mono = audio.getChannelData(0);
+  if (chs > 1) {
+    const m = new Float32Array(n);
+    for (let c = 0; c < chs; c++) { const d = audio.getChannelData(c); for (let i = 0; i < n; i++) m[i] += d[i] / chs; }
+    mono = m;
+  }
+  const size = Math.min(sr * CHUNK_SEC, Math.floor((SEND_MAX - 44) / 2));
+  const out = [];
+  for (let o = 0, k = 1; o < n; o += size, k++) {
+    if (n - o < sr / 2 && out.length) break;
+    out.push({ blob: toWav(mono.subarray(o, o + size), sr), name: `part${k}.wav`, offset: o / sr });
+  }
+  return out;
+}
+
+function toWav(f, sr) {
+  const b = new ArrayBuffer(44 + f.length * 2), v = new DataView(b);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + f.length * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  w(36, 'data'); v.setUint32(40, f.length * 2, true);
+  for (let i = 0; i < f.length; i++) { const s = Math.max(-1, Math.min(1, f[i])); v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true); }
+  return new Blob([b], { type: 'audio/wav' });
+}
+
+// "Please try again in 1m2.5s" から待ち秒数を取り出す
+function waitSec(msg) {
+  const x = /try again in\s*(?:(\d+)h)?(?:(\d+)m(?!s))?(?:([\d.]+)s)?(?:([\d.]+)ms)?/i.exec(msg);
+  if (!x) return 20;
+  return (+x[1] || 0) * 3600 + (+x[2] || 0) * 60 + (+x[3] || 0) + (+x[4] || 0) / 1000 || 20;
+}
+
+async function callGroq(piece, lang, signal) {
+  for (let attempt = 0; ; attempt++) {
+    const fd = new FormData();
+    fd.append('file', piece.blob, piece.name);
+    fd.append('model', 'whisper-large-v3');
+    fd.append('response_format', 'verbose_json');
+    fd.append('temperature', '0');
+    if (lang) fd.append('language', lang);
+    let r;
+    try { r = await fetch(GROQ_URL, { method: 'POST', headers: { Authorization: 'Bearer ' + prefs.groqKey }, body: fd, signal }); }
+    catch (e) {
+      if (e.name === 'AbortError') throw e;
+      if (attempt < 2) { await sleep(3000, signal); continue; }
+      throw new Error('Groq につながりませんでした。通信状態を確認してください');
+    }
+    if (r.ok) return r.json();
+    let msg = '';
+    try { msg = (await r.json()).error?.message || ''; } catch {}
+    if (r.status === 401) throw new Error('APIキーが正しくありません。「設定」で Groq の APIキーを確かめてください');
+    if (r.status === 413) throw new Error('ファイルが大きすぎて送れませんでした');
+    if (r.status === 429) {
+      const w = waitSec(msg);
+      if (attempt < 3 && w <= 90) { progress(`無料枠の上限に達したので ${Math.ceil(w)} 秒待っています…`); await sleep(w * 1000 + 500, signal); continue; }
+      throw new Error('Groq の無料枠をいったん使い切りました。しばらく時間をおいてから、もう一度試してください');
+    }
+    if (r.status >= 500 && attempt < 2) { await sleep(3000, signal); continue; }
+    throw new Error(`文字起こしに失敗しました（${r.status}${msg ? '：' + msg : ''}）`);
+  }
+}
+
+async function transcribeFile(file) {
+  const ac = new AbortController();
+  importing = ac;
+  el.impIntro.hidden = true; el.impProg.hidden = false;
+  progress('準備しています…', 0);
+  requestWake();
+  const s = blank();
+  s.title = file.name.replace(/\.[^.]+$/, '');
+  s.lang = prefs.lang;
+  const lang = prefs.lang.slice(0, 2);
+  let failed = null;
+  try {
+    let pieces;
+    if (file.size <= SEND_MAX && SEND_EXT.test(file.name)) pieces = [{ blob: file, name: file.name, offset: 0 }];
+    else { progress('長い録音なので分けています…', 0.02); pieces = await splitAudio(file); }
+    let prev = '';
+    for (let i = 0; i < pieces.length; i++) {
+      const p = pieces[i];
+      progress(pieces.length > 1 ? `文字にしています…（${i + 1} / ${pieces.length}）` : '文字にしています…', (i + 0.1) / pieces.length);
+      const res = await callGroq(p, lang, ac.signal);
+      const segs = res.segments || (res.text ? [{ start: 0, text: res.text }] : []);
+      for (const g of segs) {
+        // 無音部分でWhisperが作りがちな架空の文を捨てる
+        if (g.no_speech_prob > 0.6 && g.avg_logprob < -1) continue;
+        const text = tidy(g.text, s.lang, false);
+        if (!text || text === prev) continue;
+        prev = text;
+        s.segs.push({ t: p.offset + (g.start || 0), text });
+      }
+      s.duration = Math.max(s.duration, p.offset + (res.duration || 0));
+      progress(el.progMsg.textContent, (i + 1) / pieces.length);
+    }
+    if (!s.segs.length) throw new Error('声が見つかりませんでした。別のファイルで試してください');
+  } catch (e) {
+    failed = e;
+  } finally {
+    importing = null;
+    releaseWake();
+  }
+
+  if (failed && failed.name === 'AbortError' && !s.segs.length) { closeSheet(el.imp); toast('文字起こしを中止しました'); return; }
+  if (s.segs.length) {
+    if (!cur.segs.length && !cur.title.trim()) sessions = sessions.filter(x => x !== cur);
+    cur = s; s.updatedAt = Date.now(); ensureListed();
+    dirty = true; saveNow();
+    renderAll(); el.scroller.scrollTop = 0;
+    closeSheet(el.imp);
+    toast(failed ? `途中まで（${nf.format(charCount(s))}字）保存しました。${failed.name === 'AbortError' ? '' : failed.message}` : `${nf.format(charCount(s))}字の文字起こしができました`);
+    return;
+  }
+  showImportIntro(failed.message || '文字起こしに失敗しました', true);
+}
+
+/* ---------- 通知 ---------- */
+let toastTimer = 0;
+function toast(msg) {
+  el.toast.textContent = msg; el.toast.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.toast.hidden = true; }, Math.max(2800, msg.length * 90));
+}
+
+/* ---------- 起動 ---------- */
+function envNotice() {
+  if (!SR) {
+    return IN_APP
+      ? 'LINE などアプリ内のブラウザでは音声認識が使えません。メニューから「ブラウザで開く」を選んでください。'
+      : 'このブラウザは音声認識に対応していません。Android は Chrome、iPhone は Safari で開いてください。';
+  }
+  if (!window.isSecureContext) return 'マイクを使うには https:// で始まるアドレスで開く必要があります。';
+  return '';
+}
+const note = envNotice();
+if (note) { el.notice.textContent = note; el.notice.hidden = false; }
+if (!SR || !window.isSecureContext) el.rec.disabled = true;
+
+renderAll();
+el.scroller.scrollTop = el.scroller.scrollHeight;
+
+if ('serviceWorker' in navigator && window.isSecureContext) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+})();
+</script>
+</body>
+</html>
