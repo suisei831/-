@@ -1,5 +1,5 @@
 // アプリ本体をキャッシュして、電波が弱くても画面を開けるようにする
-const CACHE = 'koekaki-v3';
+const CACHE = 'koekaki-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

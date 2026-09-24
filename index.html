@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>コエカキ</title>
 <meta name="description" content="話した言葉をその場で文字にする、スマホ用の文字起こしアプリ">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <link rel="manifest" href="manifest.webmanifest">
@@ -16,188 +16,254 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="コエカキ">
 <style>
-/* iOS のシステムカラーに合わせたトークン */
 :root{
-  --bg:#FFFFFF; --sheet-bg:#F2F2F7; --cell:#FFFFFF;
-  --label:#000000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3);
-  --sep:rgba(60,60,67,.29); --fill:rgba(120,120,128,.12); --switch-off:rgba(120,120,128,.16);
-  --tint:#007AFF; --red:#FF3B30; --green:#34C759; --orange:#FF9500;
-  --bar:rgba(249,249,249,.78); --hud:rgba(255,255,255,.92); --ring:#D1D1D6; --scrim:rgba(0,0,0,.4);
-  --shadow:0 10px 36px rgba(0,0,0,.14);
+  --bg:#F5F5F7; --sheet-bg:rgba(242,242,247,.94); --cell:#FFFFFF;
+  --label:#1D1D1F; --label2:#6E6E73; --label3:#AEAEB2;
+  --sep:rgba(0,0,0,.09); --fill:rgba(118,118,128,.12); --switch-off:rgba(120,120,128,.16);
+  --tint:#0071E3; --red:#FF3B30; --green:#34C759; --orange:#FF9500;
+  --glass:rgba(255,255,255,.66);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 .5px rgba(255,255,255,.6), 0 0 0 .5px rgba(0,0,0,.07), 0 10px 30px rgba(0,0,0,.09);
+  --shadow:0 20px 60px rgba(0,0,0,.18);
+  --scrim:rgba(0,0,0,.28);
+  --ai:linear-gradient(100deg,#0894FF 0%,#8E5CF7 38%,#E0479E 66%,#FF6B2C 100%);
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Segoe UI","Yu Gothic UI",Meiryo,system-ui,sans-serif;
-  --dock-h:150px;
+  --dock-h:96px;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#000000; --sheet-bg:#1C1C1E; --cell:#2C2C2E;
-    --label:#FFFFFF; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
-    --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --switch-off:rgba(120,120,128,.32);
-    --tint:#0A84FF; --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
-    --bar:rgba(22,22,24,.78); --hud:rgba(44,44,46,.92); --ring:#636366; --scrim:rgba(0,0,0,.55);
-    --shadow:0 10px 36px rgba(0,0,0,.5);
+    --bg:#000000; --sheet-bg:rgba(28,28,30,.94); --cell:#2C2C2E;
+    --label:#F5F5F7; --label2:#A1A1A6; --label3:#636366;
+    --sep:rgba(255,255,255,.1); --fill:rgba(118,118,128,.24); --switch-off:rgba(120,120,128,.32);
+    --tint:#2997FF; --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
+    --glass:rgba(44,44,48,.58);
+    --glass-edge:inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 0 .5px rgba(255,255,255,.1), 0 10px 30px rgba(0,0,0,.55);
+    --shadow:0 20px 60px rgba(0,0,0,.6);
+    --scrim:rgba(0,0,0,.5);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#000000; --sheet-bg:#1C1C1E; --cell:#2C2C2E;
-  --label:#FFFFFF; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3);
-  --sep:rgba(84,84,88,.65); --fill:rgba(118,118,128,.24); --switch-off:rgba(120,120,128,.32);
-  --tint:#0A84FF; --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
-  --bar:rgba(22,22,24,.78); --hud:rgba(44,44,46,.92); --ring:#636366; --scrim:rgba(0,0,0,.55);
-  --shadow:0 10px 36px rgba(0,0,0,.5);
+  --bg:#000000; --sheet-bg:rgba(28,28,30,.94); --cell:#2C2C2E;
+  --label:#F5F5F7; --label2:#A1A1A6; --label3:#636366;
+  --sep:rgba(255,255,255,.1); --fill:rgba(118,118,128,.24); --switch-off:rgba(120,120,128,.32);
+  --tint:#2997FF; --red:#FF453A; --green:#30D158; --orange:#FF9F0A;
+  --glass:rgba(44,44,48,.58);
+  --glass-edge:inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 0 .5px rgba(255,255,255,.1), 0 10px 30px rgba(0,0,0,.55);
+  --shadow:0 20px 60px rgba(0,0,0,.6);
+  --scrim:rgba(0,0,0,.5);
   color-scheme:dark;
 }
 
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{
-  background:var(--bg); color:var(--label); font-family:var(--font); font-size:17px; line-height:1.4;
-  letter-spacing:-.01em; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  background:var(--bg); color:var(--label); font-family:var(--font); font-size:17px; line-height:1.45;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   -webkit-tap-highlight-color:transparent; -webkit-text-size-adjust:100%;
   overflow:hidden; position:relative;
 }
 button,select,input{font:inherit;color:inherit;letter-spacing:inherit}
 button{cursor:pointer;-webkit-user-select:none;user-select:none}
-:focus-visible{outline:2px solid var(--tint);outline-offset:2px;border-radius:8px}
+:focus-visible{outline:2px solid var(--tint);outline-offset:3px}
 [hidden]{display:none!important}
 svg{display:block}
 
-/* ナビゲーションバー */
-.nav{
-  position:fixed; top:0; left:0; right:0; z-index:10;
-  padding:env(safe-area-inset-top,0px) 8px 0;
-  display:grid; grid-template-columns:auto 1fr auto; align-items:center; height:calc(env(safe-area-inset-top,0px) + 44px);
-  background:var(--bg); transition:background-color .2s, box-shadow .2s;
+/* ガラス素材 */
+.glass{
+  background:var(--glass); box-shadow:var(--glass-edge);
+  -webkit-backdrop-filter:blur(24px) saturate(190%); backdrop-filter:blur(24px) saturate(190%);
 }
-.nav.scrolled{
-  background:var(--bar); box-shadow:0 .5px 0 var(--sep);
-  -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
+
+/* 上下のフェード（文字がボタンの下にきれいに潜る） */
+.fade-top,.fade-bottom{position:fixed;left:0;right:0;z-index:5;pointer-events:none}
+.fade-top{top:0;height:calc(env(safe-area-inset-top,0px) + 76px);background:linear-gradient(var(--bg) 45%, transparent)}
+.fade-bottom{bottom:0;height:calc(var(--dock-h) + 40px);background:linear-gradient(transparent, var(--bg) 62%)}
+
+/* 上部の浮いたボタン */
+.topbar{
+  position:fixed; top:0; left:0; right:0; z-index:10; pointer-events:none;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 0;
+  display:flex; justify-content:space-between; align-items:center;
 }
-.nav-title{
-  font-size:17px; font-weight:600; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  padding:0 6px; opacity:0; transition:opacity .2s;
+.topbar > *{pointer-events:auto}
+.circle{
+  width:46px; height:46px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--label); padding:0;
 }
-.nav.show-title .nav-title{opacity:1}
-.back{
-  display:flex; align-items:center; gap:2px; height:44px; padding:0 8px 0 2px; border:0; background:transparent;
-  color:var(--tint); font-size:17px;
-}
-.back svg{width:13px;height:22px}
-.nav-actions{display:flex}
-.icon-btn{
-  width:44px; height:44px; display:grid; place-items:center; border:0; background:transparent; color:var(--tint); border-radius:12px;
-}
-.icon-btn svg{width:24px;height:24px}
-.back:active,.icon-btn:active,.tool:active,.text-btn:active{opacity:.35}
-.back:disabled,.icon-btn:disabled,.tool:disabled{color:var(--label3);pointer-events:none}
+.capsule{display:flex; border-radius:23px; height:46px; padding:0 4px}
+.capsule .icon-btn{width:44px; height:46px}
+.icon-btn{border:0; background:transparent; display:grid; place-items:center; color:var(--label); padding:0}
+.circle svg,.icon-btn svg{width:22px;height:22px}
+.circle:active,.icon-btn:active,.side:active{transform:scale(.92)}
+.circle,.icon-btn,.side{transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .2s}
+.icon-btn:disabled,.circle:disabled{opacity:.3; pointer-events:none}
 
 /* 本文 */
 .scroller{
   position:absolute; inset:0; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain;
-  padding:calc(env(safe-area-inset-top,0px) + 44px) 20px calc(var(--dock-h) + 24px);
+  padding:calc(env(safe-area-inset-top,0px) + 72px) 22px calc(var(--dock-h) + 48px);
 }
-.doc-head{max-width:680px; margin:0 auto; padding:2px 0 14px}
+.doc-head{max-width:680px; margin:0 auto 22px}
+.eyebrow{font-size:15px; font-weight:600; color:var(--label2); letter-spacing:.01em}
 .large-title{
-  display:block; width:100%; border:0; background:transparent; padding:0; margin:0;
-  font-size:clamp(26px, 7.6vw, 34px); font-weight:700; letter-spacing:.01em; line-height:1.2;
-  text-overflow:ellipsis; border-radius:8px;
+  display:block; width:100%; border:0; background:transparent; padding:0; margin:2px 0 0;
+  font-size:clamp(28px, 8.4vw, 36px); font-weight:700; line-height:1.18; letter-spacing:.01em;
+  font-feature-settings:"palt"; text-overflow:ellipsis;
 }
-.large-title::placeholder{color:var(--label);opacity:1}
+.large-title::placeholder{color:var(--label3);opacity:1}
 .large-title:focus{outline:none}
-.large-title:focus::placeholder{color:var(--label3)}
-.meta{margin-top:4px; font-size:15px; color:var(--label2); font-variant-numeric:tabular-nums}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.chip{
+  font-size:13px; font-weight:500; color:var(--label2); background:var(--fill); border-radius:999px; padding:4px 10px;
+  font-variant-numeric:tabular-nums;
+}
+.is-empty .doc-head{display:none}
 
 .notice{
-  max-width:680px; margin:0 auto 16px; display:flex; gap:10px; align-items:flex-start;
-  background:var(--fill); border-radius:12px; padding:12px 14px; font-size:15px; line-height:1.5;
+  max-width:680px; margin:0 auto 18px; display:flex; gap:10px; align-items:flex-start;
+  background:var(--cell); border-radius:18px; padding:14px 16px; font-size:15px; line-height:1.55; box-shadow:0 0 0 .5px var(--sep);
 }
 .notice svg{width:20px;height:20px;flex:none;color:var(--orange);margin-top:1px}
 
-.doc{max-width:680px; margin:0 auto; font-size:17px; line-height:1.65}
-.seg{margin:0; padding:5px 0; display:grid; grid-template-columns:3.4em 1fr; column-gap:12px; align-items:baseline}
-.seg time{font-size:13px; color:var(--label2); font-variant-numeric:tabular-nums; user-select:none; -webkit-user-select:none; text-align:right}
+.doc{max-width:680px; margin:0 auto; font-size:19px; line-height:1.72}
+.seg{
+  margin:0; padding:6px 0; display:grid; grid-template-columns:3em 1fr; column-gap:14px; align-items:baseline;
+  transition:opacity .6s ease;
+}
+.seg time{font-size:12px; font-weight:500; color:var(--label3); font-variant-numeric:tabular-nums; text-align:right; user-select:none; -webkit-user-select:none}
 .doc.no-time .seg{grid-template-columns:1fr}
 .doc.no-time .seg time{display:none}
-.tx{overflow-wrap:anywhere; outline:none; border-radius:6px; margin:0 -4px; padding:0 4px; transition:background-color .15s}
+.tx{overflow-wrap:anywhere; outline:none; border-radius:8px; margin:0 -5px; padding:1px 5px; transition:background-color .2s}
 .tx:focus{background:var(--fill)}
-.seg.interim{color:var(--label3)}
+
+/* 聞き取り中の言葉：大きく、末尾ほど色づく */
+.seg.interim{display:block; padding:14px 0 4px}
+.seg.interim time{display:none}
+.seg.interim .tx{
+  font-size:25px; font-weight:600; line-height:1.45; font-feature-settings:"palt";
+  background:linear-gradient(100deg, var(--label) 0%, var(--label) 45%, #8E5CF7 72%, #E0479E 88%, #FF6B2C 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
 .seg.interim .tx::after{
-  content:""; display:inline-block; width:2px; height:1.05em; background:var(--tint); border-radius:1px;
-  vertical-align:-.18em; margin-left:2px; animation:blink 1s steps(1) infinite;
+  content:""; display:inline-block; width:3px; height:.95em; margin-left:3px; border-radius:2px;
+  background:#E0479E; vertical-align:-.12em; animation:blink 1s steps(1) infinite;
 }
 @keyframes blink{50%{opacity:0}}
 
-.empty{text-align:center; padding:9vh 12px 0; color:var(--label2); display:grid; justify-items:center; gap:6px}
-.empty > svg{width:52px;height:52px;color:var(--label3);margin-bottom:10px}
-.empty-title{margin:0; font-size:20px; font-weight:600; color:var(--label)}
-.empty-body{margin:0; font-size:15px; line-height:1.55; max-width:22em}
-.empty-body svg{display:inline-block;width:17px;height:17px;vertical-align:-3px;color:var(--tint)}
+/* 録音中は歌詞表示のように、確定した行が奥へ薄れていく */
+.live .doc .seg:not(.interim){opacity:.3}
+.live .doc .seg:nth-last-child(3){opacity:.55}
+.live .doc .seg:nth-last-child(2){opacity:.9}
 
-/* 下部の録音バー */
+/* 最初の画面 */
+.hero{
+  min-height:calc(100dvh - env(safe-area-inset-top,0px) - 72px - var(--dock-h) - 64px);
+  display:grid; align-content:center; justify-items:start; gap:16px; padding-bottom:24px;
+}
+.hero-title{
+  margin:0; font-size:clamp(40px, 12.5vw, 64px); font-weight:800; line-height:1.12; letter-spacing:.01em;
+  font-feature-settings:"palt";
+  background:var(--ai); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero-sub{margin:0; font-size:17px; line-height:1.6; color:var(--label2); max-width:21em}
+.hero-link{
+  border:0; background:transparent; color:var(--tint); font-size:17px; padding:6px 0; display:flex; align-items:center; gap:4px;
+}
+.hero-link svg{width:8px;height:14px}
+
+/* 画面ふちの光（録音中） */
+.glow{
+  position:fixed; inset:0; z-index:40; pointer-events:none; overflow:hidden; opacity:0; transition:opacity .7s ease;
+  -webkit-mask-image:linear-gradient(to right,#000 0,transparent 26px,transparent calc(100% - 26px),#000 100%),linear-gradient(to bottom,#000 0,transparent 26px,transparent calc(100% - 26px),#000 100%);
+  mask-image:linear-gradient(to right,#000 0,transparent 26px,transparent calc(100% - 26px),#000 100%),linear-gradient(to bottom,#000 0,transparent 26px,transparent calc(100% - 26px),#000 100%);
+}
+.glow i{
+  position:absolute; left:50%; top:50%; width:220vmax; height:220vmax; margin:-110vmax 0 0 -110vmax;
+  background:conic-gradient(#0894FF,#8E5CF7,#E0479E,#FF6B2C,#FFC53D,#0894FF);
+  animation:spin 6s linear infinite; will-change:transform;
+}
+@keyframes spin{to{transform:rotate(1turn)}}
+.live .glow{opacity:1}
+
+/* 下部の操作 */
 .dock{
-  position:fixed; left:0; right:0; bottom:0; z-index:10;
-  background:var(--bar); box-shadow:0 -.5px 0 var(--sep);
-  -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
-  padding:12px 20px calc(env(safe-area-inset-bottom,0px) + 10px);
-  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  position:fixed; left:0; right:0; bottom:0; z-index:10; pointer-events:none;
+  padding:0 16px calc(env(safe-area-inset-bottom,0px) + 16px);
+  display:grid; justify-items:center; gap:10px;
 }
-.tool{
-  justify-self:center; display:grid; justify-items:center; gap:3px; border:0; background:transparent;
-  color:var(--tint); font-size:11px; font-weight:500; padding:6px 12px; min-width:64px; border-radius:12px;
-}
-.tool svg{width:25px;height:25px}
-.rec-wrap{display:grid; justify-items:center; gap:8px}
-.clock{font-size:17px; font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:.02em}
-.dock.live .clock{color:var(--red)}
+.dock > *{pointer-events:auto}
+.dock-row{display:flex; align-items:center; gap:14px}
+.side{width:52px; height:52px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--label); padding:0}
+.side svg{width:23px;height:23px}
+.state{font-size:13px; font-weight:500; color:var(--label2); min-height:0; pointer-events:none}
+.state:empty{display:none}
+
 .rec{
-  width:72px; height:72px; border-radius:50%; border:4px solid var(--ring); background:transparent; padding:0;
-  display:grid; place-items:center;
+  height:56px; min-width:188px; border:0; border-radius:28px; padding:0 24px; position:relative;
+  display:flex; align-items:center; justify-content:center; gap:10px; font-size:17px; font-weight:600;
+  background:var(--label); color:var(--bg);
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1), background-color .3s, color .3s;
 }
-.rec::before{
-  content:""; width:56px; height:56px; border-radius:28px; background:var(--red);
-  transition:width .3s cubic-bezier(.2,.8,.2,1), height .3s cubic-bezier(.2,.8,.2,1), border-radius .3s cubic-bezier(.2,.8,.2,1);
-}
-.rec:active::before{transform:scale(.94)}
-.rec[aria-pressed="true"]::before{width:28px; height:28px; border-radius:7px}
-.rec:disabled{opacity:.35; pointer-events:none}
-.state{font-size:13px; color:var(--label2); min-height:18px}
+.rec:active{transform:scale(.96)}
+.rec:disabled{opacity:.3; pointer-events:none}
+.rec .dot{width:22px; height:22px; border-radius:50%; background:var(--ai); display:grid; place-items:center}
+.rec .dot svg{width:12px; height:12px; color:#fff}
+.rec .idle-ui{display:contents}
+.rec .live-ui{display:none; align-items:center; gap:12px}
+.rec[aria-pressed="true"]{background:var(--glass); color:var(--label); box-shadow:var(--glass-edge); -webkit-backdrop-filter:blur(24px) saturate(190%); backdrop-filter:blur(24px) saturate(190%)}
+.rec[aria-pressed="true"] .idle-ui{display:none}
+.rec[aria-pressed="true"] .live-ui{display:flex}
+.bars{display:flex; align-items:center; gap:3px; height:22px}
+.bars i{width:3px; height:100%; border-radius:2px; background:var(--ai); background-size:500% 100%; animation:bar 1s ease-in-out infinite}
+.bars i:nth-child(1){background-position:0 0; animation-delay:-.2s}
+.bars i:nth-child(2){background-position:25% 0; animation-delay:-.5s}
+.bars i:nth-child(3){background-position:50% 0; animation-delay:-.1s}
+.bars i:nth-child(4){background-position:75% 0; animation-delay:-.7s}
+.bars i:nth-child(5){background-position:100% 0; animation-delay:-.35s}
+@keyframes bar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+.clock{font-variant-numeric:tabular-nums; min-width:3.2em; text-align:left}
+.stop{width:30px; height:30px; border-radius:50%; background:var(--red); display:grid; place-items:center}
+.stop::before{content:""; width:10px; height:10px; border-radius:2.5px; background:#fff}
 
 /* シート */
 .sheet-wrap{
   position:fixed; inset:0; z-index:30; display:flex; align-items:flex-end; justify-content:center;
-  background:transparent; transition:background-color .3s;
+  background:transparent; transition:background-color .35s;
 }
 .sheet-wrap.open{background:var(--scrim)}
 .sheet{
-  width:100%; max-width:640px; max-height:calc(100% - env(safe-area-inset-top,0px) - 16px);
-  display:flex; flex-direction:column; background:var(--sheet-bg); border-radius:14px 14px 0 0; box-shadow:var(--shadow);
-  transform:translateY(100%); transition:transform .4s cubic-bezier(.32,.72,0,1);
+  width:calc(100% - 16px); max-width:620px; margin-bottom:calc(env(safe-area-inset-bottom,0px) + 8px);
+  max-height:calc(100% - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px);
+  display:flex; flex-direction:column; border-radius:34px; background:var(--sheet-bg); box-shadow:var(--shadow);
+  -webkit-backdrop-filter:blur(30px) saturate(180%); backdrop-filter:blur(30px) saturate(180%);
+  transform:translateY(calc(100% + 40px)); transition:transform .45s cubic-bezier(.32,.72,0,1);
 }
 .sheet-wrap.open .sheet{transform:none}
-.grabber{width:36px; height:5px; border-radius:3px; background:var(--label3); margin:6px auto 0; flex:none}
-.sheet-bar{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; min-height:48px; padding:0 8px; flex:none}
+.sheet-bar{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:14px 14px 6px; flex:none}
 .sheet-bar h2{margin:0; font-size:17px; font-weight:600; text-align:center}
 .sheet-bar > :first-child{justify-self:start}
 .sheet-bar > :last-child{justify-self:end}
-.text-btn{border:0; background:transparent; color:var(--tint); font-size:17px; padding:10px 8px; border-radius:8px}
+.x{width:36px; height:36px; border-radius:50%; border:0; background:var(--fill); color:var(--label2); display:grid; place-items:center; padding:0}
+.x svg{width:13px; height:13px}
+.x:disabled{opacity:.35; pointer-events:none}
+.text-btn{border:0; background:transparent; color:var(--tint); font-size:17px; padding:8px 6px; border-radius:8px}
 .text-btn.strong{font-weight:600}
 .text-btn.danger{color:var(--red)}
-.text-btn:disabled{color:var(--label3); pointer-events:none}
-.sheet-body{overflow-y:auto; overscroll-behavior:contain; padding:0 16px calc(env(safe-area-inset-bottom,0px) + 28px)}
+.sheet-body{overflow-y:auto; overscroll-behavior:contain; padding:0 16px 24px}
 
-.group-head{font-size:13px; font-weight:400; color:var(--label2); margin:22px 16px 7px}
-.group{background:var(--cell); border-radius:10px; overflow:hidden; list-style:none; margin:0; padding:0}
-.group-foot{font-size:13px; color:var(--label2); margin:7px 16px 0; line-height:1.45}
+.group-head{font-size:13px; font-weight:600; color:var(--label2); margin:22px 18px 8px}
+.group{background:var(--cell); border-radius:22px; overflow:hidden; list-style:none; margin:0; padding:0}
+.group-foot{font-size:13px; color:var(--label2); margin:8px 18px 0; line-height:1.5}
 .group-foot a{color:var(--tint); text-decoration:none}
 .group-foot.err{color:var(--red)}
 .group-foot:empty{display:none}
 .sheet-body > .group:first-child{margin-top:8px}
 .row{
   position:relative; display:flex; align-items:center; justify-content:space-between; gap:12px;
-  min-height:44px; padding:10px 16px; font-size:17px;
+  min-height:52px; padding:12px 18px; font-size:17px;
 }
-.row + .row::before{content:""; position:absolute; top:0; left:16px; right:0; height:.5px; background:var(--sep)}
+.row + .row::before{content:""; position:absolute; top:0; left:18px; right:0; height:.5px; background:var(--sep)}
 .row-select{
   appearance:none; -webkit-appearance:none; border:0; background:transparent; color:var(--label2); font-size:17px;
   text-align:right; text-align-last:right; padding:0 20px 0 0; min-width:0; max-width:60%;
@@ -222,48 +288,47 @@ svg{display:block}
 .switch:checked{background:var(--green)}
 .switch:checked::after{transform:translateX(20px)}
 
-/* 履歴 */
-.hist{min-height:60px; padding-top:8px; padding-bottom:8px}
-.open{flex:1; min-width:0; border:0; background:transparent; padding:0; text-align:left; display:grid; gap:1px}
-.open .n{font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.open .m{font-size:15px; color:var(--label2); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.check{width:20px; height:20px; color:var(--tint); flex:none}
+/* 記録一覧 */
+.hist{padding-top:14px; padding-bottom:14px; align-items:center}
+.open{flex:1; min-width:0; border:0; background:transparent; padding:0; text-align:left; display:grid; gap:2px}
+.open .n{font-size:17px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.open .p{font-size:15px; color:var(--label2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.open .m{font-size:13px; color:var(--label3); font-variant-numeric:tabular-nums; margin-top:2px}
+.check{width:22px; height:22px; flex:none; border-radius:50%; background:var(--tint); color:#fff; display:grid; place-items:center}
+.check svg{width:12px; height:12px}
 .minus{width:24px; height:24px; border:0; padding:0; background:transparent; flex:none; color:var(--red)}
-.minus svg{width:24px; height:24px}
-.minus svg{transition:transform .2s}
+.minus svg{width:24px; height:24px; transition:transform .2s}
 .hist.armed .minus svg{transform:rotate(-90deg)}
-.del{display:none; border:0; background:var(--red); color:#fff; font-size:15px; font-weight:600; border-radius:8px; padding:8px 14px; flex:none}
+.del{display:none; border:0; background:var(--red); color:#fff; font-size:15px; font-weight:600; border-radius:999px; padding:8px 16px; flex:none}
 .hist.armed .del{display:block}
 .none{color:var(--label2); justify-content:center}
 
 /* 録音ファイル */
-.lead{font-size:15px; line-height:1.55; color:var(--label2); margin:4px 16px 14px}
+.lead{font-size:15px; line-height:1.6; color:var(--label2); margin:2px 18px 16px}
 .steps .row{justify-content:flex-start; align-items:flex-start; gap:14px}
 .num{
-  width:24px; height:24px; border-radius:50%; background:var(--tint); color:#fff; font-size:14px; font-weight:600;
-  display:grid; place-items:center; flex:none; margin-top:1px; font-variant-numeric:tabular-nums;
+  width:26px; height:26px; border-radius:50%; background:var(--ai); color:#fff; font-size:14px; font-weight:700;
+  display:grid; place-items:center; flex:none; font-variant-numeric:tabular-nums;
 }
 .steps small{display:block; font-size:13px; color:var(--label2); margin-top:2px}
 .filled-btn{
-  display:block; width:100%; margin-top:20px; border:0; border-radius:12px; min-height:50px; padding:12px;
-  background:var(--tint); color:#fff; font-size:17px; font-weight:600;
+  display:block; width:100%; margin-top:20px; border:0; border-radius:999px; min-height:54px; padding:14px;
+  background:var(--label); color:var(--bg); font-size:17px; font-weight:600;
 }
-.filled-btn:active{opacity:.7}
-.prog{padding:20px 0 4px; text-align:center}
-.prog-msg{margin:0; font-size:17px; font-weight:600}
-.bar{height:4px; border-radius:2px; background:var(--fill); overflow:hidden; margin:18px 16px 4px}
-.bar i{display:block; height:100%; width:0; background:var(--tint); border-radius:2px; transition:width .35s ease}
-.prog .text-btn{margin-top:12px}
+.filled-btn:active{transform:scale(.98)}
+.prog{padding:22px 0 4px; text-align:center}
+.prog-msg{margin:0; font-size:19px; font-weight:600}
+.bar{height:6px; border-radius:3px; background:var(--fill); overflow:hidden; margin:20px 18px 6px}
+.bar i{display:block; height:100%; width:0; background:var(--ai); border-radius:3px; transition:width .4s ease}
+.prog .text-btn{margin-top:14px}
 
 /* 通知 */
 .toast{
-  position:fixed; left:50%; top:calc(env(safe-area-inset-top,0px) + 8px); transform:translateX(-50%); z-index:50;
-  background:var(--hud); color:var(--label); box-shadow:var(--shadow);
-  -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
-  padding:11px 18px; border-radius:20px; font-size:15px; font-weight:600; line-height:1.4; text-align:center;
-  width:max-content; max-width:calc(100% - 32px); animation:drop .35s cubic-bezier(.2,.8,.2,1);
+  position:fixed; left:50%; top:calc(env(safe-area-inset-top,0px) + 10px); transform:translateX(-50%); z-index:50;
+  color:var(--label); padding:12px 20px; border-radius:24px; font-size:15px; font-weight:600; line-height:1.4; text-align:center;
+  width:max-content; max-width:calc(100% - 32px); animation:drop .45s cubic-bezier(.2,.9,.25,1.15);
 }
-@keyframes drop{from{opacity:0; transform:translate(-50%,-14px)}}
+@keyframes drop{from{opacity:0; transform:translate(-50%,-16px) scale(.94)}}
 
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{transition:none!important; animation:none!important}
@@ -272,29 +337,31 @@ svg{display:block}
 </head>
 <body>
 
-<nav id="nav" class="nav">
-  <button id="btnHistory" class="back" type="button" aria-label="これまでの記録">
-    <svg viewBox="0 0 13 22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2 2 11l9 9"/></svg>
-    記録
+<div class="glow" aria-hidden="true"><i></i></div>
+<div class="fade-top" aria-hidden="true"></div>
+
+<div class="topbar">
+  <button id="btnHistory" class="circle glass" type="button" aria-label="これまでの記録">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.6" cy="6.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="4.6" cy="17.5" r="1.15" fill="currentColor" stroke="none"/></svg>
   </button>
-  <div id="navTitle" class="nav-title" aria-hidden="true"></div>
-  <div class="nav-actions">
+  <div class="capsule glass">
     <button id="btnImport" class="icon-btn" type="button" aria-label="録音ファイルから文字起こし">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19M9 13.5v3M12 11.5v7M15 13.5v3"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19M9 13.5v3M12 11.5v7M15 13.5v3"/></svg>
     </button>
     <button id="btnNew" class="icon-btn" type="button" aria-label="新しい記録">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V13"/><path d="M17.8 3.7a1.9 1.9 0 0 1 2.6 2.6l-8.2 8.2-3.5.9.9-3.5z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V13"/><path d="M17.8 3.7a1.9 1.9 0 0 1 2.6 2.6l-8.2 8.2-3.5.9.9-3.5z"/></svg>
     </button>
     <button id="btnSettings" class="icon-btn" type="button" aria-label="設定">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9.2"/><circle cx="7.8" cy="12" r="1.25" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.25" fill="currentColor" stroke="none"/><circle cx="16.2" cy="12" r="1.25" fill="currentColor" stroke="none"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>
     </button>
   </div>
-</nav>
+</div>
 
 <main id="scroller" class="scroller">
   <header id="docHead" class="doc-head">
-    <input id="title" class="large-title" type="text" autocomplete="off" enterkeyhint="done" aria-label="タイトル">
-    <div id="stats" class="meta"></div>
+    <div id="eyebrow" class="eyebrow"></div>
+    <input id="title" class="large-title" type="text" autocomplete="off" enterkeyhint="done" aria-label="タイトル" placeholder="タイトルなし">
+    <div id="chips" class="chips"></div>
   </header>
   <div id="notice" class="notice" hidden>
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.3 3.9a2 2 0 0 1 3.4 0l8 13.6A2 2 0 0 1 20 20.5H4a2 2 0 0 1-1.7-3zM12 9a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0v-4a1 1 0 0 0-1-1m0 7.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4"/></svg>
@@ -303,29 +370,37 @@ svg{display:block}
   <div id="doc" class="doc" aria-label="文字起こし"></div>
 </main>
 
+<div class="fade-bottom" aria-hidden="true"></div>
+
 <footer id="dock" class="dock">
-  <button id="btnCopy" class="tool" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="8.5" y="8" width="11.5" height="13" rx="2.2"/><path d="M15.5 8V5.2A2.2 2.2 0 0 0 13.3 3H6.2A2.2 2.2 0 0 0 4 5.2v9.6A2.2 2.2 0 0 0 6.2 17h2.3"/></svg>
-    コピー
-  </button>
-  <div class="rec-wrap">
-    <div id="clock" class="clock">0:00</div>
-    <button id="btnRec" class="rec" type="button" aria-pressed="false" aria-label="録音を始める"></button>
-    <div id="state" class="state" aria-live="polite">タップして録音</div>
+  <div id="state" class="state" aria-live="polite"></div>
+  <div class="dock-row">
+    <button id="btnCopy" class="side glass" type="button" aria-label="コピー">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8.5" y="8" width="11.5" height="13" rx="2.6"/><path d="M15.5 8V5.6A2.6 2.6 0 0 0 12.9 3H6.6A2.6 2.6 0 0 0 4 5.6v8.8A2.6 2.6 0 0 0 6.6 17h1.9"/></svg>
+    </button>
+    <button id="btnRec" class="rec" type="button" aria-pressed="false" aria-label="文字起こしを始める">
+      <span class="idle-ui">
+        <span class="dot"><svg viewBox="0 0 12 12" fill="currentColor"><rect x="4" y="1" width="4" height="6.5" rx="2"/><path d="M2.3 5.8a3.7 3.7 0 0 0 7.4 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M6 9.6v1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+        話しはじめる
+      </span>
+      <span class="live-ui">
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <span id="clock" class="clock">0:00</span>
+        <span class="stop" aria-hidden="true"></span>
+      </span>
+    </button>
+    <button id="btnShare" class="side glass" type="button" aria-label="共有">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14.5V3M8 7l4-4 4 4"/><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5"/></svg>
+    </button>
   </div>
-  <button id="btnShare" class="tool" type="button">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14.5V3M8 7l4-4 4 4"/><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5"/></svg>
-    共有
-  </button>
 </footer>
 
 <div id="historySheet" class="sheet-wrap" hidden>
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="hTitle">
-    <div class="grabber"></div>
     <header class="sheet-bar">
       <button id="btnHistEdit" class="text-btn" type="button">編集</button>
-      <h2 id="hTitle">これまでの記録</h2>
-      <button class="text-btn strong" type="button" data-close>閉じる</button>
+      <h2 id="hTitle">記録</h2>
+      <button class="x" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
     </header>
     <div class="sheet-body">
       <ul id="historyList" class="group"></ul>
@@ -336,11 +411,10 @@ svg{display:block}
 
 <div id="settingsSheet" class="sheet-wrap" hidden>
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sTitle">
-    <div class="grabber"></div>
     <header class="sheet-bar">
       <span></span>
       <h2 id="sTitle">設定</h2>
-      <button class="text-btn strong" type="button" data-close>完了</button>
+      <button class="x" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
     </header>
     <div class="sheet-body">
       <h3 class="group-head">その場の文字起こし</h3>
@@ -396,11 +470,10 @@ svg{display:block}
 
 <div id="importSheet" class="sheet-wrap" hidden>
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="iTitle">
-    <div class="grabber"></div>
     <header class="sheet-bar">
       <span></span>
       <h2 id="iTitle">録音ファイルから</h2>
-      <button id="btnImpClose" class="text-btn strong" type="button" data-close>閉じる</button>
+      <button id="btnImpClose" class="x" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
     </header>
     <div class="sheet-body">
       <div id="importIntro">
@@ -424,7 +497,7 @@ svg{display:block}
 </div>
 <input id="fileIn" type="file" accept="audio/*,.m4a,.mp3,.wav,.aac,.ogg,.webm,.flac,.mp4" hidden>
 
-<div id="toast" class="toast" role="status" hidden></div>
+<div id="toast" class="toast glass" role="status" hidden></div>
 
 <script>
 (() => {
@@ -439,6 +512,7 @@ const K_DATA = 'koekaki.sessions.v1';
 const K_PREFS = 'koekaki.prefs.v1';
 const CJK = '　-ヿ㐀-鿿＀-￯';
 const CJK_GAP = new RegExp('([' + CJK + '])\\s+(?=[' + CJK + '])', 'g');
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
 
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
@@ -457,8 +531,8 @@ let quickFails = 0, fatal = '', netWait = false;
 let importing = null;
 
 const el = {
-  nav: $('#nav'), navTitle: $('#navTitle'), head: $('#docHead'),
-  title: $('#title'), stats: $('#stats'), scroller: $('#scroller'), doc: $('#doc'), notice: $('#notice'), noticeText: $('#noticeText'),
+  body: document.body, eyebrow: $('#eyebrow'), title: $('#title'), chips: $('#chips'),
+  scroller: $('#scroller'), doc: $('#doc'), notice: $('#notice'), noticeText: $('#noticeText'),
   dock: $('#dock'), clock: $('#clock'), rec: $('#btnRec'), state: $('#state'), copy: $('#btnCopy'), share: $('#btnShare'),
   newBtn: $('#btnNew'), histBtn: $('#btnHistory'), setBtn: $('#btnSettings'), importBtn: $('#btnImport'),
   hist: $('#historySheet'), histList: $('#historyList'), histEdit: $('#btnHistEdit'),
@@ -492,12 +566,11 @@ function fmtClock(sec) {
   const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0');
 }
-function fmtDate(ts) {
-  const d = new Date(ts);
-  return `${d.getMonth() + 1}月${d.getDate()}日 ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
-}
-function defaultTitle(s) { return fmtDate(s.createdAt) + ' の記録'; }
-function titleOf(s) { return s.title.trim() || (s.segs[0] ? s.segs[0].text.slice(0, 24) : defaultTitle(s)); }
+const hm = d => `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+function fmtDate(ts) { const d = new Date(ts); return `${d.getMonth() + 1}月${d.getDate()}日 ${hm(d)}`; }
+function fmtLong(ts) { const d = new Date(ts); return `${d.getMonth() + 1}月${d.getDate()}日（${WEEK[d.getDay()]}） ${hm(d)}`; }
+function titleOf(s) { return s.title.trim() || (s.segs[0] ? s.segs[0].text.slice(0, 24) : fmtDate(s.createdAt) + ' の記録'); }
+function previewOf(s) { const g = s.title.trim() ? s.segs[0] : s.segs[1]; return g ? g.text : ''; }
 function charCount(s) { return s.segs.reduce((n, g) => n + Array.from(g.text).length, 0); }
 const nf = new Intl.NumberFormat('ja-JP');
 
@@ -520,23 +593,24 @@ function segEl(g, i) {
   return p;
 }
 
-function emptyEl() {
+function heroEl() {
   const d = document.createElement('div');
-  d.className = 'empty';
+  d.className = 'hero';
   d.innerHTML =
-    '<svg viewBox="0 0 52 52" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M8 22v8M16 15v22M24 8v36M32 17v18M40 12v28M48 22v8"/></svg>' +
-    '<p class="empty-title">話すと、ここに文字が現れます</p>' +
-    '<p class="empty-body">下の赤いボタンを押して話してください。書き込まれた文字はタップして直せます。</p>' +
-    '<p class="empty-body">画面を消して長く録るときは、ボイスメモで録音して右上の ' +
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19M9 13.5v3M12 11.5v7M15 13.5v3"/></svg>' +
-    ' から読み込めます。</p>';
+    '<h1 class="hero-title">話せば、<br>文字になる。</h1>' +
+    '<p class="hero-sub">下のボタンを押して、話しはじめてください。書き起こした文字は、あとから直したり共有したりできます。</p>' +
+    '<button class="hero-link" type="button">録音ファイルから文字にする<svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg></button>';
+  d.querySelector('.hero-link').addEventListener('click', () => el.importBtn.click());
   return d;
 }
+
+function isEmpty() { return !cur.segs.length && !recording; }
 
 function renderDoc() {
   el.doc.textContent = '';
   el.doc.classList.toggle('no-time', !prefs.showTime);
-  if (!cur.segs.length && !recording) el.doc.append(emptyEl());
+  el.body.classList.toggle('is-empty', isEmpty());
+  if (isEmpty()) el.doc.append(heroEl());
   cur.segs.forEach((g, i) => el.doc.append(segEl(g, i)));
   interimEl = document.createElement('p');
   interimEl.className = 'seg interim'; interimEl.hidden = true;
@@ -546,20 +620,22 @@ function renderDoc() {
 }
 
 function renderHeader() {
+  el.eyebrow.textContent = fmtLong(cur.createdAt);
   el.title.value = cur.title;
-  el.title.placeholder = defaultTitle(cur);
-  el.navTitle.textContent = cur.title.trim() || defaultTitle(cur);
   renderStats();
 }
 
 function renderStats() {
   const n = charCount(cur);
-  el.stats.textContent = `${nf.format(n)}文字 · 原稿用紙 ${(n / 400).toFixed(1)}枚 · ${cur.segs.length}行`;
+  el.chips.textContent = '';
+  for (const t of [`${nf.format(n)}文字`, `原稿用紙 ${(n / 400).toFixed(1)}枚`, fmtClock(cur.duration)]) {
+    const c = document.createElement('span'); c.className = 'chip'; c.textContent = t; el.chips.append(c);
+  }
 }
 
 function renderAll() { renderHeader(); renderDoc(); renderClock(); renderRecState(); }
 
-function nearBottom() { const s = el.scroller; return s.scrollHeight - s.scrollTop - s.clientHeight < 96; }
+function nearBottom() { const s = el.scroller; return s.scrollHeight - s.scrollTop - s.clientHeight < 120; }
 function stickBottom(was) { if (was) el.scroller.scrollTop = el.scroller.scrollHeight; }
 
 /* ---------- 音声認識 ---------- */
@@ -583,7 +659,8 @@ function commit(raw) {
   const was = nearBottom();
   const g = { t: uttT ?? elapsed(), text };
   uttT = null;
-  el.doc.querySelector('.empty')?.remove();
+  el.doc.querySelector('.hero')?.remove();
+  el.body.classList.remove('is-empty');
   cur.segs.push(g);
   cur.updatedAt = Date.now();
   ensureListed();
@@ -597,7 +674,6 @@ function setInterim(t) {
   interim = t;
   if (t && uttT == null) uttT = elapsed();
   const was = nearBottom();
-  interimEl.firstChild.textContent = t ? fmtClock(uttT ?? elapsed()) : '';
   interimEl.lastChild.textContent = t;
   interimEl.hidden = !t;
   stickBottom(was);
@@ -657,11 +733,12 @@ function startRecording() {
   if (!SR || recording || importing) return;
   cur.lang = prefs.lang;
   recording = true; takeStart = Date.now(); quickFails = 0; fatal = ''; netWait = false;
-  el.doc.querySelector('.empty')?.remove();
+  el.doc.querySelector('.hero')?.remove();
+  el.body.classList.remove('is-empty');
   el.scroller.scrollTop = el.scroller.scrollHeight;
   startEngine();
   requestWake();
-  renderRecState();
+  renderRecState(); renderClock();
 }
 
 function stopRecording(msg) {
@@ -671,7 +748,7 @@ function stopRecording(msg) {
   const r = rec;
   if (r) { try { r.stop(); } catch {} }
   releaseWake();
-  renderRecState(); renderClock();
+  renderRecState(); renderStats();
   if (!cur.segs.length && !interim) renderDoc();
   if (cur.segs.length) { cur.updatedAt = Date.now(); ensureListed(); }
   dirty = true; saveNow();
@@ -680,9 +757,9 @@ function stopRecording(msg) {
 
 function renderRecState() {
   el.rec.setAttribute('aria-pressed', String(recording));
-  el.rec.setAttribute('aria-label', recording ? '録音を止める' : '録音を始める');
-  el.dock.classList.toggle('live', recording);
-  el.state.textContent = !SR ? 'このブラウザでは使えません' : recording ? (netWait ? '接続を待っています…' : '録音中') : 'タップして録音';
+  el.rec.setAttribute('aria-label', recording ? '文字起こしを止める' : '文字起こしを始める');
+  el.body.classList.toggle('live', recording);
+  el.state.textContent = recording && netWait ? '接続を待っています…' : '';
   for (const b of [el.newBtn, el.histBtn, el.importBtn]) b.disabled = recording;
   el.lang.disabled = recording;
 }
@@ -708,7 +785,7 @@ document.addEventListener('visibilitychange', () => {
   } else {
     if (stoppedInBackground) {
       stoppedInBackground = false;
-      toast('画面が切り替わったので止めました。画面を消して録るときはボイスメモで録音して、右上のボタンから読み込んでください');
+      toast('画面が切り替わったので止めました。画面を消して録るときはボイスメモで録音して、右上から読み込んでください');
     }
     if (importing) requestWake();
   }
@@ -740,7 +817,6 @@ el.doc.addEventListener('focusout', e => {
 });
 el.title.addEventListener('input', () => {
   cur.title = el.title.value; cur.updatedAt = Date.now();
-  el.navTitle.textContent = cur.title.trim() || defaultTitle(cur);
   if (cur.title.trim()) ensureListed();
   scheduleSave();
 });
@@ -755,7 +831,7 @@ el.newBtn.addEventListener('click', () => {
   saveNow();
   cur = blank();
   renderAll();
-  el.scroller.scrollTop = 0; onScroll();
+  el.scroller.scrollTop = 0;
   toast('新しい記録を作りました');
 });
 
@@ -805,7 +881,7 @@ function openSheet(s) {
 function closeSheet(s) {
   if (s.hidden) return;
   s.classList.remove('open');
-  setTimeout(() => { if (!s.classList.contains('open')) s.hidden = true; }, 400);
+  setTimeout(() => { if (!s.classList.contains('open')) s.hidden = true; }, 450);
 }
 for (const s of sheets) {
   s.addEventListener('click', e => {
@@ -817,12 +893,12 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') for (const s of sheets) if (!s.hidden && !(s === el.imp && importing)) closeSheet(s);
 });
 
-/* 履歴 */
+/* 記録一覧 */
 let histEdit = false;
 el.histBtn.addEventListener('click', () => { if (recording) return; histEdit = false; renderHistory(); openSheet(el.hist); });
 el.histEdit.addEventListener('click', () => { histEdit = !histEdit; renderHistory(); });
 
-const ICON_CHECK = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4L16.5 6"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.2 6.3l2.5 2.4 5-5.2"/></svg>';
 const ICON_MINUS = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12h10" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
 function renderHistory() {
@@ -846,20 +922,23 @@ function renderHistory() {
     }
     const open = document.createElement('button'); open.type = 'button'; open.className = 'open';
     const n = document.createElement('span'); n.className = 'n'; n.textContent = titleOf(s);
+    open.append(n);
+    const pv = previewOf(s);
+    if (pv) { const p = document.createElement('span'); p.className = 'p'; p.textContent = pv; open.append(p); }
     const m = document.createElement('span'); m.className = 'm';
     m.textContent = `${fmtDate(s.createdAt)} · ${nf.format(charCount(s))}文字 · ${fmtClock(s.duration)}`;
-    open.append(n, m);
+    open.append(m);
     open.addEventListener('click', () => {
       if (histEdit) { li.classList.remove('armed'); return; }
       cur = s; renderAll(); closeSheet(el.hist);
-      el.scroller.scrollTop = 0; onScroll();
+      el.scroller.scrollTop = 0;
     });
     li.append(open);
     if (histEdit) {
       const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = '削除';
       del.addEventListener('click', () => {
         sessions = sessions.filter(x => x !== s);
-        if (s === cur) { cur = sessions[0] || blank(); renderAll(); el.scroller.scrollTop = 0; onScroll(); }
+        if (s === cur) { cur = sessions[0] || blank(); renderAll(); el.scroller.scrollTop = 0; }
         dirty = true; saveNow();
         if (!sessions.length) histEdit = false;
         renderHistory();
@@ -912,7 +991,7 @@ el.importBtn.addEventListener('click', () => { if (recording) return; if (!impor
 el.pick.addEventListener('click', () => {
   if (!prefs.groqKey) {
     closeSheet(el.imp); openSettings();
-    setTimeout(() => el.key.focus(), 420);
+    setTimeout(() => el.key.focus(), 460);
     toast('Groq の APIキーを入れてください');
     return;
   }
@@ -1012,7 +1091,7 @@ async function transcribeFile(file) {
     let prev = '';
     for (let i = 0; i < pieces.length; i++) {
       const p = pieces[i];
-      const label = pieces.length > 1 ? `文字にしています…（${i + 1} / ${pieces.length}）` : '文字にしています…';
+      const label = pieces.length > 1 ? `文字にしています（${i + 1} / ${pieces.length}）` : '文字にしています…';
       progress(label, (i + 0.1) / pieces.length);
       const res = await callGroq(p.make(), p.name, lang, ac.signal);
       const segs = res.segments || (res.text ? [{ start: 0, text: res.text }] : []);
@@ -1040,7 +1119,7 @@ async function transcribeFile(file) {
     if (!cur.segs.length && !cur.title.trim()) sessions = sessions.filter(x => x !== cur);
     cur = s; s.updatedAt = Date.now(); ensureListed();
     dirty = true; saveNow();
-    renderAll(); el.scroller.scrollTop = 0; onScroll();
+    renderAll(); el.scroller.scrollTop = 0;
     showImportIntro(); closeSheet(el.imp);
     toast(failed ? `途中まで（${nf.format(charCount(s))}文字）保存しました。${failed.name === 'AbortError' ? '' : failed.message}` : `${nf.format(charCount(s))}文字の文字起こしができました`);
     return;
@@ -1057,12 +1136,6 @@ function toast(msg) {
 }
 
 /* ---------- レイアウト ---------- */
-function onScroll() {
-  const y = el.scroller.scrollTop;
-  el.nav.classList.toggle('scrolled', y > 1);
-  el.nav.classList.toggle('show-title', y > el.title.offsetHeight);
-}
-el.scroller.addEventListener('scroll', onScroll, { passive: true });
 const setDockH = () => document.documentElement.style.setProperty('--dock-h', el.dock.offsetHeight + 'px');
 if ('ResizeObserver' in window) new ResizeObserver(setDockH).observe(el.dock);
 setDockH();
@@ -1082,7 +1155,6 @@ if (note) { el.noticeText.textContent = note; el.notice.hidden = false; }
 if (!SR || !window.isSecureContext) el.rec.disabled = true;
 
 renderAll();
-onScroll();
 
 if ('serviceWorker' in navigator && window.isSecureContext) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
