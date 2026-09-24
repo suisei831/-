@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>コエカキ</title>
-<meta name="description" content="話した言葉をその場で文字にする、スマホ用の文字起こしアプリ">
+<meta name="description" content="ボイスメモの録音を文字にする、スマホ用の文字起こしアプリ">
 <meta name="theme-color" content="#F5F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -94,8 +94,8 @@ svg{display:block}
 .capsule .icon-btn{width:44px; height:46px}
 .icon-btn{border:0; background:transparent; display:grid; place-items:center; color:var(--label); padding:0}
 .circle svg,.icon-btn svg{width:22px;height:22px}
-.circle:active,.icon-btn:active,.side:active{transform:scale(.92)}
-.circle,.icon-btn,.side{transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .2s}
+.circle:active,.icon-btn:active{transform:scale(.92)}
+.circle,.icon-btn{transition:transform .2s cubic-bezier(.2,.8,.2,1), opacity .2s}
 .icon-btn:disabled,.circle:disabled{opacity:.3; pointer-events:none}
 
 /* 本文 */
@@ -156,19 +156,33 @@ svg{display:block}
 /* 最初の画面 */
 .hero{
   min-height:calc(100dvh - env(safe-area-inset-top,0px) - 72px - var(--dock-h) - 64px);
-  display:grid; align-content:center; justify-items:start; gap:16px; padding-bottom:24px;
+  display:grid; align-content:center; gap:16px; padding-bottom:16px;
 }
 .hero-title{
   margin:0; font-size:clamp(40px, 12.5vw, 64px); font-weight:800; line-height:1.12; letter-spacing:.01em;
-  font-feature-settings:"palt";
+  font-feature-settings:"palt"; justify-self:start;
   background:var(--ai); -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-.hero-sub{margin:0; font-size:17px; line-height:1.6; color:var(--label2); max-width:21em}
-.hero-link{
-  border:0; background:transparent; color:var(--tint); font-size:17px; padding:6px 0; display:flex; align-items:center; gap:4px;
+.hero-sub{margin:0; font-size:17px; line-height:1.6; color:var(--label2); max-width:22em}
+.howto{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:14px; font-size:16px; line-height:1.5}
+.howto li{display:flex; gap:12px; align-items:flex-start}
+.howto small{display:block; font-size:13px; color:var(--label2)}
+.num{
+  width:26px; height:26px; border-radius:50%; background:var(--ai); color:#fff; font-size:14px; font-weight:700;
+  display:grid; place-items:center; flex:none; font-variant-numeric:tabular-nums;
 }
-.hero-link svg{width:8px;height:14px}
-
+.hero-note{margin:6px 0 0; font-size:13px; line-height:1.55; color:var(--label2); display:flex; gap:6px; align-items:center}
+.hero-note svg{width:16px; height:16px; flex:none}
+.setup{background:var(--cell); border-radius:22px; padding:18px; box-shadow:0 0 0 .5px var(--sep); margin-top:6px}
+.setup-title{margin:0; font-size:17px; font-weight:600}
+.setup-body{margin:6px 0 0; font-size:15px; line-height:1.55; color:var(--label2)}
+.setup-actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+.pill{
+  display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 18px; border-radius:999px; border:0;
+  font-size:15px; font-weight:600; text-decoration:none;
+}
+.pill.dark{background:var(--label); color:var(--bg)}
+.pill.soft{background:var(--fill); color:var(--tint)}
 
 /* 下部の操作 */
 .dock{
@@ -177,27 +191,31 @@ svg{display:block}
   display:grid; justify-items:center; gap:10px;
 }
 .dock > *{pointer-events:auto}
-.dock-row{display:flex; align-items:center; gap:14px}
-.side{width:52px; height:52px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--label); padding:0}
-.side svg{width:23px;height:23px}
-.state{font-size:13px; font-weight:500; color:var(--label2); min-height:0; pointer-events:none}
+.dock-row{display:flex; align-items:center; gap:12px}
+.state{font-size:13px; font-weight:500; color:var(--label2); pointer-events:none}
 .state:empty{display:none}
 
-.rec{
-  height:56px; min-width:188px; border:0; border-radius:28px; padding:0 24px; position:relative;
-  display:flex; align-items:center; justify-content:center; gap:10px; font-size:17px; font-weight:600;
-  background:var(--label); color:var(--bg);
-  box-shadow:0 10px 28px rgba(0,0,0,.18);
-  transition:transform .25s cubic-bezier(.2,.8,.2,1), background-color .3s, color .3s;
+.pick{
+  height:56px; border:0; border-radius:28px; padding:0 26px 0 22px;
+  display:flex; align-items:center; gap:10px; font-size:17px; font-weight:600;
+  background:var(--label); color:var(--bg); box-shadow:0 10px 28px rgba(0,0,0,.18);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1);
 }
-.rec:active{transform:scale(.96)}
+.pick svg{width:22px; height:22px}
+.pick:active{transform:scale(.96)}
+.pick:disabled{opacity:.3; pointer-events:none}
+.live .pick{display:none}
+
+.rec{
+  height:56px; min-width:56px; border:0; border-radius:28px; padding:0; color:var(--label);
+  display:grid; place-items:center; transition:transform .25s cubic-bezier(.2,.8,.2,1);
+}
+.rec .mic{width:24px; height:24px}
+.rec:active{transform:scale(.94)}
 .rec:disabled{opacity:.3; pointer-events:none}
-.rec .dot{width:22px; height:22px; border-radius:50%; background:var(--ai); display:grid; place-items:center}
-.rec .dot svg{width:12px; height:12px; color:#fff}
-.rec .idle-ui{display:contents}
-.rec .live-ui{display:none; align-items:center; gap:12px}
-.rec[aria-pressed="true"]{background:var(--glass); color:var(--label); box-shadow:var(--glass-edge); -webkit-backdrop-filter:blur(24px) saturate(190%); backdrop-filter:blur(24px) saturate(190%)}
-.rec[aria-pressed="true"] .idle-ui{display:none}
+.rec .live-ui{display:none; align-items:center; gap:12px; font-size:17px; font-weight:600}
+.rec[aria-pressed="true"]{padding:0 14px 0 24px; min-width:188px}
+.rec[aria-pressed="true"] .mic{display:none}
 .rec[aria-pressed="true"] .live-ui{display:flex}
 .bars{display:flex; align-items:center; gap:3px; height:22px}
 .bars i{width:3px; height:100%; border-radius:2px; background:var(--ai); background-size:500% 100%; animation:bar 1s ease-in-out infinite}
@@ -241,7 +259,6 @@ svg{display:block}
 .group{background:var(--cell); border-radius:22px; overflow:hidden; list-style:none; margin:0; padding:0}
 .group-foot{font-size:13px; color:var(--label2); margin:8px 18px 0; line-height:1.5}
 .group-foot a{color:var(--tint); text-decoration:none}
-.group-foot.err{color:var(--red)}
 .group-foot:empty{display:none}
 .sheet-body > .group:first-child{margin-top:8px}
 .row{
@@ -288,24 +305,20 @@ svg{display:block}
 .hist.armed .del{display:block}
 .none{color:var(--label2); justify-content:center}
 
-/* 録音ファイル */
-.lead{font-size:15px; line-height:1.6; color:var(--label2); margin:2px 18px 16px}
-.steps .row{justify-content:flex-start; align-items:flex-start; gap:14px}
-.num{
-  width:26px; height:26px; border-radius:50%; background:var(--ai); color:#fff; font-size:14px; font-weight:700;
-  display:grid; place-items:center; flex:none; font-variant-numeric:tabular-nums;
-}
-.steps small{display:block; font-size:13px; color:var(--label2); margin-top:2px}
+/* 取り込みの進み具合 */
 .filled-btn{
   display:block; width:100%; margin-top:20px; border:0; border-radius:999px; min-height:54px; padding:14px;
   background:var(--label); color:var(--bg); font-size:17px; font-weight:600;
 }
 .filled-btn:active{transform:scale(.98)}
-.prog{padding:22px 0 4px; text-align:center}
-.prog-msg{margin:0; font-size:19px; font-weight:600}
+.prog{padding:14px 0 4px; text-align:center}
+.prog-info{margin:0 0 6px; font-size:15px; color:var(--label2); font-variant-numeric:tabular-nums}
+.prog-info:empty{display:none}
+.prog-msg{margin:0; font-size:19px; font-weight:600; font-variant-numeric:tabular-nums}
 .bar{height:6px; border-radius:3px; background:var(--fill); overflow:hidden; margin:20px 18px 6px}
 .bar i{display:block; height:100%; width:0; background:var(--ai); border-radius:3px; transition:width .4s ease}
 .prog .text-btn{margin-top:14px}
+.err-msg{margin:0 6px; font-size:17px; line-height:1.6; text-align:left}
 
 /* 通知 */
 .toast{
@@ -329,11 +342,11 @@ svg{display:block}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.6" cy="6.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="4.6" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="4.6" cy="17.5" r="1.15" fill="currentColor" stroke="none"/></svg>
   </button>
   <div class="capsule glass">
-    <button id="btnImport" class="icon-btn" type="button" aria-label="録音ファイルから文字起こし">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19M9 13.5v3M12 11.5v7M15 13.5v3"/></svg>
+    <button id="btnCopy" class="icon-btn" type="button" aria-label="コピー">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8.5" y="8" width="11.5" height="13" rx="2.6"/><path d="M15.5 8V5.6A2.6 2.6 0 0 0 12.9 3H6.6A2.6 2.6 0 0 0 4 5.6v8.8A2.6 2.6 0 0 0 6.6 17h1.9"/></svg>
     </button>
-    <button id="btnNew" class="icon-btn" type="button" aria-label="新しい記録">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V13"/><path d="M17.8 3.7a1.9 1.9 0 0 1 2.6 2.6l-8.2 8.2-3.5.9.9-3.5z"/></svg>
+    <button id="btnShare" class="icon-btn" type="button" aria-label="共有">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14.5V3M8 7l4-4 4 4"/><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5"/></svg>
     </button>
     <button id="btnSettings" class="icon-btn" type="button" aria-label="設定">
       <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/></svg>
@@ -359,22 +372,17 @@ svg{display:block}
 <footer id="dock" class="dock">
   <div id="state" class="state" aria-live="polite"></div>
   <div class="dock-row">
-    <button id="btnCopy" class="side glass" type="button" aria-label="コピー">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8.5" y="8" width="11.5" height="13" rx="2.6"/><path d="M15.5 8V5.6A2.6 2.6 0 0 0 12.9 3H6.6A2.6 2.6 0 0 0 4 5.6v8.8A2.6 2.6 0 0 0 6.6 17h1.9"/></svg>
-    </button>
-    <button id="btnRec" class="rec" type="button" aria-pressed="false" aria-label="文字起こしを始める">
-      <span class="idle-ui">
-        <span class="dot"><svg viewBox="0 0 12 12" fill="currentColor"><rect x="4" y="1" width="4" height="6.5" rx="2"/><path d="M2.3 5.8a3.7 3.7 0 0 0 7.4 0" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M6 9.6v1.4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
-        話しはじめる
-      </span>
+    <button id="btnRec" class="rec glass" type="button" aria-pressed="false" aria-label="その場で話して文字にする">
+      <svg class="mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="8.5" y="2.8" width="7" height="12" rx="3.5"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V21"/></svg>
       <span class="live-ui">
         <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
         <span id="clock" class="clock">0:00</span>
         <span class="stop" aria-hidden="true"></span>
       </span>
     </button>
-    <button id="btnShare" class="side glass" type="button" aria-label="共有">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14.5V3M8 7l4-4 4 4"/><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5"/></svg>
+    <button id="btnPick" class="pick" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M13.5 3v5.5H19M9 13.5v3M12 11.5v7M15 13.5v3"/></svg>
+      録音ファイルを選ぶ
     </button>
   </div>
 </footer>
@@ -387,6 +395,10 @@ svg{display:block}
       <button class="x" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
     </header>
     <div class="sheet-body">
+      <div class="group">
+        <button id="btnNew" class="row row-btn" type="button">新しい記録を作る</button>
+      </div>
+      <h3 class="group-head">これまでの記録</h3>
       <ul id="historyList" class="group"></ul>
       <p class="group-foot">記録はこの端末の中だけに保存されています。</p>
     </div>
@@ -401,7 +413,16 @@ svg{display:block}
       <button class="x" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
     </header>
     <div class="sheet-body">
-      <h3 class="group-head">その場の文字起こし</h3>
+      <h3 class="group-head">録音ファイルの文字起こし</h3>
+      <div class="group">
+        <label class="row" for="optKey">
+          <span>APIキー</span>
+          <input id="optKey" class="row-input" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="未設定">
+        </label>
+      </div>
+      <p class="group-foot">Groq の APIキーを入れます。1日8時間分まで無料です。<a href="https://console.groq.com/keys" target="_blank" rel="noopener">キーを発行する</a></p>
+
+      <h3 class="group-head">共通</h3>
       <div class="group">
         <label class="row" for="optLang">
           <span>話す言語</span>
@@ -418,6 +439,15 @@ svg{display:block}
             <option value="pt-BR">Português</option>
           </select>
         </label>
+        <label class="row" for="optTime">
+          <span>経過時間を表示</span>
+          <input id="optTime" class="switch" type="checkbox" role="switch">
+        </label>
+      </div>
+      <p class="group-foot">経過時間がオンのときは、コピーや共有するテキストにも [0:12] の形で入ります。</p>
+
+      <h3 class="group-head">その場の文字起こし（マイク）</h3>
+      <div class="group">
         <label class="row" for="optPeriod">
           <span>文末に「。」を付ける</span>
           <input id="optPeriod" class="switch" type="checkbox" role="switch">
@@ -425,29 +455,11 @@ svg{display:block}
       </div>
       <p class="group-foot">画面を消したり別のアプリに切り替えたりすると止まります。</p>
 
-      <h3 class="group-head">表示</h3>
-      <div class="group">
-        <label class="row" for="optTime">
-          <span>経過時間を表示</span>
-          <input id="optTime" class="switch" type="checkbox" role="switch">
-        </label>
-      </div>
-      <p class="group-foot">オンのときは、コピーや共有するテキストにも [0:12] の形で入ります。</p>
-
-      <h3 class="group-head">録音ファイルの文字起こし</h3>
-      <div class="group">
-        <label class="row" for="optKey">
-          <span>APIキー</span>
-          <input id="optKey" class="row-input" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="未設定">
-        </label>
-      </div>
-      <p class="group-foot">Groq の APIキーを入れます。1日8時間分まで無料です。<a href="https://console.groq.com/keys" target="_blank" rel="noopener">キーを発行する</a></p>
-
       <h3 class="group-head">書き出し</h3>
       <div class="group">
         <button id="btnDownload" class="row row-btn" type="button">いまの記録をテキストファイルで保存</button>
       </div>
-      <p class="group-foot">その場の文字起こしは Android では Google、iPhone では Apple のサーバーで処理されます。録音ファイルの文字起こしでは音声が Groq に送られます。書き起こした文字と APIキーは、この端末の中だけに保存されます。</p>
+      <p class="group-foot">録音ファイルの文字起こしでは、音声が Groq に送られます。マイクでの文字起こしは Android では Google、iPhone では Apple のサーバーで処理されます。書き起こした文字と APIキーは、この端末の中だけに保存されます。</p>
     </div>
   </section>
 </div>
@@ -456,25 +468,21 @@ svg{display:block}
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="iTitle">
     <header class="sheet-bar">
       <span></span>
-      <h2 id="iTitle">録音ファイルから</h2>
+      <h2 id="iTitle">文字にしています</h2>
       <button id="btnImpClose" class="x" type="button" data-close aria-label="閉じる"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l10 10M12 2 2 12"/></svg></button>
     </header>
     <div class="sheet-body">
-      <div id="importIntro">
-        <p class="lead">画面を消したまま録りたいときは、iPhone の「ボイスメモ」で録音して、ここで文字にします。</p>
-        <ol class="group steps">
-          <li class="row"><span class="num">1</span><span>「ボイスメモ」で録音する<small>画面を消しても録音は続きます</small></span></li>
-          <li class="row"><span class="num">2</span><span>録音の「…」→「共有」→「"ファイル"に保存」</span></li>
-          <li class="row"><span class="num">3</span><span>下のボタンから、保存したファイルを選ぶ</span></li>
-        </ol>
-        <button id="btnPick" class="filled-btn" type="button">ファイルを選ぶ</button>
-        <p id="importNote" class="group-foot" aria-live="polite"></p>
-      </div>
-      <div id="importProg" class="prog" hidden>
+      <div id="importProg" class="prog">
+        <p id="progInfo" class="prog-info"></p>
         <p id="progMsg" class="prog-msg" aria-live="polite"></p>
         <div class="bar"><i id="progBar"></i></div>
-        <p class="group-foot">終わるまで画面をつけたままにしてください。1時間の録音でも数分で終わります。</p>
+        <p class="group-foot">終わるまで画面をつけたままにしてください。100分の録音でも数分で終わります。</p>
         <button id="btnCancel" class="text-btn danger" type="button">中止</button>
+      </div>
+      <div id="importErr" class="prog" hidden>
+        <p id="errMsg" class="err-msg" aria-live="polite"></p>
+        <button id="btnRetry" class="filled-btn" type="button">ファイルを選び直す</button>
+        <button id="btnErrSettings" class="text-btn" type="button">設定を開く</button>
       </div>
     </div>
   </section>
@@ -517,12 +525,13 @@ let importing = null;
 const el = {
   body: document.body, eyebrow: $('#eyebrow'), title: $('#title'), chips: $('#chips'),
   scroller: $('#scroller'), doc: $('#doc'), notice: $('#notice'), noticeText: $('#noticeText'),
-  dock: $('#dock'), clock: $('#clock'), rec: $('#btnRec'), state: $('#state'), copy: $('#btnCopy'), share: $('#btnShare'),
-  newBtn: $('#btnNew'), histBtn: $('#btnHistory'), setBtn: $('#btnSettings'), importBtn: $('#btnImport'),
-  hist: $('#historySheet'), histList: $('#historyList'), histEdit: $('#btnHistEdit'),
+  dock: $('#dock'), clock: $('#clock'), rec: $('#btnRec'), pick: $('#btnPick'), state: $('#state'),
+  copy: $('#btnCopy'), share: $('#btnShare'), setBtn: $('#btnSettings'), histBtn: $('#btnHistory'),
+  hist: $('#historySheet'), histList: $('#historyList'), histEdit: $('#btnHistEdit'), newBtn: $('#btnNew'),
   settings: $('#settingsSheet'), lang: $('#optLang'), period: $('#optPeriod'), time: $('#optTime'), key: $('#optKey'), download: $('#btnDownload'),
-  imp: $('#importSheet'), impClose: $('#btnImpClose'), impIntro: $('#importIntro'), impProg: $('#importProg'), impNote: $('#importNote'),
-  pick: $('#btnPick'), file: $('#fileIn'), progMsg: $('#progMsg'), progBar: $('#progBar'), cancel: $('#btnCancel'),
+  imp: $('#importSheet'), impTitle: $('#iTitle'), impClose: $('#btnImpClose'), impProg: $('#importProg'), impErr: $('#importErr'),
+  errMsg: $('#errMsg'), retry: $('#btnRetry'), errSettings: $('#btnErrSettings'),
+  file: $('#fileIn'), progInfo: $('#progInfo'), progMsg: $('#progMsg'), progBar: $('#progBar'), cancel: $('#btnCancel'),
   toast: $('#toast'),
 };
 
@@ -549,6 +558,11 @@ function fmtClock(sec) {
   sec = Math.max(0, Math.floor(sec));
   const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
   return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0');
+}
+function fmtLength(sec) {
+  const m = Math.round(sec / 60);
+  if (m < 1) return `${Math.max(1, Math.round(sec))}秒`;
+  return m >= 60 ? `${Math.floor(m / 60)}時間${m % 60 ? (m % 60) + '分' : ''}` : `${m}分`;
 }
 const hm = d => `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
 function fmtDate(ts) { const d = new Date(ts); return `${d.getMonth() + 1}月${d.getDate()}日 ${hm(d)}`; }
@@ -577,14 +591,29 @@ function segEl(g, i) {
   return p;
 }
 
+const ICON_MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8.5" y="2.8" width="7" height="12" rx="3.5"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V21"/></svg>';
+
 function heroEl() {
   const d = document.createElement('div');
   d.className = 'hero';
+  const setup = prefs.groqKey ? '' :
+    '<div class="setup">' +
+      '<p class="setup-title">はじめに、APIキーを設定</p>' +
+      '<p class="setup-body">文字起こしには Groq（無料）を使います。キーを発行して、設定に貼り付けてください。最初の一度だけです。</p>' +
+      '<div class="setup-actions"><button class="pill dark" type="button" data-act="settings">設定を開く</button>' +
+      '<a class="pill soft" href="https://console.groq.com/keys" target="_blank" rel="noopener">キーを発行する</a></div>' +
+    '</div>';
   d.innerHTML =
-    '<h1 class="hero-title">話せば、<br>文字になる。</h1>' +
-    '<p class="hero-sub">下のボタンを押して、話しはじめてください。書き起こした文字は、あとから直したり共有したりできます。</p>' +
-    '<button class="hero-link" type="button">録音ファイルから文字にする<svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 1.5 6.5 7l-5 5.5"/></svg></button>';
-  d.querySelector('.hero-link').addEventListener('click', () => el.importBtn.click());
+    '<h1 class="hero-title">録音を、<br>文字に。</h1>' +
+    '<p class="hero-sub">「ボイスメモ」で録った音声を選ぶだけ。100分くらいの長い録音も、まとめて文字にできます。</p>' +
+    setup +
+    '<ol class="howto">' +
+      '<li><span class="num">1</span><span>「ボイスメモ」で録音<small>画面を消しても録音は続きます</small></span></li>' +
+      '<li><span class="num">2</span><span>録音の「…」→「共有」→「"ファイル"に保存」</span></li>' +
+      '<li><span class="num">3</span><span>下の「録音ファイルを選ぶ」から選ぶ</span></li>' +
+    '</ol>' +
+    (el.rec.hidden ? '' : '<p class="hero-note">' + ICON_MIC + '<span>マイクのボタンで、その場で話した言葉を文字にすることもできます。</span></p>');
+  d.querySelector('[data-act="settings"]')?.addEventListener('click', openKeySettings);
   return d;
 }
 
@@ -622,7 +651,7 @@ function renderAll() { renderHeader(); renderDoc(); renderClock(); renderRecStat
 function nearBottom() { const s = el.scroller; return s.scrollHeight - s.scrollTop - s.clientHeight < 120; }
 function stickBottom(was) { if (was) el.scroller.scrollTop = el.scroller.scrollHeight; }
 
-/* ---------- 音声認識 ---------- */
+/* ---------- その場の文字起こし（マイク） ---------- */
 const elapsed = () => cur.duration + (recording ? (Date.now() - takeStart) / 1000 : 0);
 
 function tidy(raw, lang, addPeriod = prefs.autoPeriod) {
@@ -715,10 +744,11 @@ function startEngine() {
 
 function startRecording() {
   if (!SR || recording || importing) return;
+  // 録音ファイルから作った記録には書き足さず、新しい記録を始める
+  if (cur.source === 'file') { saveNow(); cur = blank(); renderHeader(); }
   cur.lang = prefs.lang;
   recording = true; takeStart = Date.now(); quickFails = 0; fatal = ''; netWait = false;
-  el.doc.querySelector('.hero')?.remove();
-  el.body.classList.remove('is-empty');
+  renderDoc();
   el.scroller.scrollTop = el.scroller.scrollHeight;
   startEngine();
   requestWake();
@@ -741,10 +771,10 @@ function stopRecording(msg) {
 
 function renderRecState() {
   el.rec.setAttribute('aria-pressed', String(recording));
-  el.rec.setAttribute('aria-label', recording ? '文字起こしを止める' : '文字起こしを始める');
+  el.rec.setAttribute('aria-label', recording ? '文字起こしを止める' : 'その場で話して文字にする');
   el.body.classList.toggle('live', recording);
   el.state.textContent = recording && netWait ? '接続を待っています…' : '';
-  for (const b of [el.newBtn, el.histBtn, el.importBtn]) b.disabled = recording;
+  for (const b of [el.histBtn, el.pick]) b.disabled = recording;
   el.lang.disabled = recording;
 }
 
@@ -769,7 +799,7 @@ document.addEventListener('visibilitychange', () => {
   } else {
     if (stoppedInBackground) {
       stoppedInBackground = false;
-      toast('画面が切り替わったので止めました。画面を消して録るときはボイスメモで録音して、右上から読み込んでください');
+      toast('画面が切り替わったので止めました。画面を消して録るときはボイスメモで録音して、「録音ファイルを選ぶ」から読み込んでください');
     }
     if (importing) requestWake();
   }
@@ -811,12 +841,12 @@ el.rec.addEventListener('click', () => recording ? stopRecording() : startRecord
 
 el.newBtn.addEventListener('click', () => {
   if (recording) return;
-  if (!cur.segs.length && !cur.title.trim()) { toast('いまの記録はまだ空です'); return; }
+  closeSheet(el.hist);
+  if (!cur.segs.length && !cur.title.trim()) return;
   saveNow();
   cur = blank();
   renderAll();
   el.scroller.scrollTop = 0;
-  toast('新しい記録を作りました');
 });
 
 async function copyText(text) {
@@ -943,23 +973,51 @@ function openSettings() {
   el.lang.value = prefs.lang; el.period.checked = prefs.autoPeriod; el.time.checked = prefs.showTime; el.key.value = prefs.groqKey;
   openSheet(el.settings);
 }
+function openKeySettings() {
+  openSettings();
+  setTimeout(() => el.key.focus(), 460);
+}
 el.setBtn.addEventListener('click', openSettings);
 el.lang.addEventListener('change', () => { prefs.lang = el.lang.value; savePrefs(); });
 el.period.addEventListener('change', () => { prefs.autoPeriod = el.period.checked; savePrefs(); });
 el.time.addEventListener('change', () => { prefs.showTime = el.time.checked; savePrefs(); el.doc.classList.toggle('no-time', !prefs.showTime); });
-el.key.addEventListener('input', () => { prefs.groqKey = el.key.value.trim(); savePrefs(); });
+el.key.addEventListener('input', () => {
+  const had = !!prefs.groqKey;
+  prefs.groqKey = el.key.value.trim(); savePrefs();
+  if (had !== !!prefs.groqKey && isEmpty()) renderDoc();
+});
 
 /* ---------- 録音ファイルから文字起こし（Groq Whisper） ---------- */
 const GROQ_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
-const SEND_MAX = 24 * 1024 * 1024;           // 無料枠の上限は25MB
+const GROQ_MODELS_URL = 'https://api.groq.com/openai/v1/models';
+const SEND_TIMEOUT = 5 * 60 * 1000;
+const SEND_MAX = 24 * 1024 * 1024;           // 無料枠の上限は25MB。これ以下ならそのまま送る
+const PIECE_MAX = 20 * 1024 * 1024;          // 分けるときの1つ分の大きさ
 const SEND_EXT = /\.(m4a|mp3|mp4|mpeg|mpga|wav|ogg|webm|flac)$/i;
-const CHUNK_SEC = 600;                       // 大きいファイルは10分ずつに分けて送る
+const CHUNK_SEC = 600;                       // 展開して分けるときは10分ずつ
 
-function showImportIntro(note = '', isErr = false) {
-  el.impIntro.hidden = false; el.impProg.hidden = true;
-  el.impClose.disabled = false;
-  el.impNote.textContent = note || (prefs.groqKey ? '' : '先に「設定」で Groq の APIキー（無料）を入れておく必要があります。');
-  el.impNote.classList.toggle('err', isErr);
+el.pick.addEventListener('click', () => {
+  if (recording || importing) return;
+  if (!prefs.groqKey) { openKeySettings(); toast('先に Groq の APIキーを入れてください'); return; }
+  el.file.value = ''; el.file.click();
+});
+el.file.addEventListener('change', () => { const f = el.file.files[0]; if (f) transcribeFile(f); });
+el.cancel.addEventListener('click', () => importing?.abort());
+el.retry.addEventListener('click', () => {
+  if (!prefs.groqKey) { closeSheet(el.imp); openKeySettings(); return; }
+  el.file.value = ''; el.file.click();
+});
+el.errSettings.addEventListener('click', () => { closeSheet(el.imp); openKeySettings(); });
+
+function showProgress() {
+  el.impTitle.textContent = '文字にしています';
+  el.impProg.hidden = false; el.impErr.hidden = true; el.impClose.disabled = true;
+  el.progInfo.textContent = ''; progress('準備しています…', 0);
+}
+function showImportError(msg) {
+  el.impTitle.textContent = 'うまくいきませんでした';
+  el.impProg.hidden = true; el.impErr.hidden = false; el.impClose.disabled = false;
+  el.errMsg.textContent = msg;
 }
 function progress(msg, frac) {
   el.progMsg.textContent = msg;
@@ -971,27 +1029,200 @@ const sleep = (ms, signal) => new Promise((res, rej) => {
   signal?.addEventListener('abort', () => { clearTimeout(t); rej(new DOMException('中止', 'AbortError')); }, { once: true });
 });
 
-el.importBtn.addEventListener('click', () => { if (recording) return; if (!importing) showImportIntro(); openSheet(el.imp); });
-el.pick.addEventListener('click', () => {
-  if (!prefs.groqKey) {
-    closeSheet(el.imp); openSettings();
-    setTimeout(() => el.key.focus(), 460);
-    toast('Groq の APIキーを入れてください');
-    return;
-  }
-  el.file.value = ''; el.file.click();
-});
-el.file.addEventListener('change', () => { const f = el.file.files[0]; if (f) transcribeFile(f); });
-el.cancel.addEventListener('click', () => importing?.abort());
+// ---- 音声ファイルの分割（ここから） ----
+async function sniff(file) {
+  const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+  const s = String.fromCharCode(...b);
+  if (s.slice(4, 8) === 'ftyp') return 'mp4';
+  if (s.startsWith('ID3') || (b[0] === 0xFF && (b[1] & 0xE0) === 0xE0)) return 'mp3';
+  if (s.startsWith('RIFF')) return 'wav';
+  return '';
+}
 
-// 音声を16kHzモノラルに変換し、10分ずつのWAVを作る関数の一覧を返す（WAVは送る直前に作る）
-async function splitAudio(file) {
+/* m4a（ボイスメモの形式）を、音を展開せずにそのまま切り分ける */
+const str4 = (dv, p) => String.fromCharCode(dv.getUint8(p), dv.getUint8(p + 1), dv.getUint8(p + 2), dv.getUint8(p + 3));
+function mp4Kids(dv, start, end) {
+  const out = [];
+  let p = start;
+  while (p + 8 <= end) {
+    let size = dv.getUint32(p), hdr = 8;
+    const type = str4(dv, p + 4);
+    if (size === 1) { size = Number(dv.getBigUint64(p + 8)); hdr = 16; }
+    else if (size === 0) size = end - p;
+    if (size < hdr || p + size > end) break;
+    out.push({ type, start: p, body: p + hdr, end: p + size });
+    p += size;
+  }
+  return out;
+}
+
+async function splitMp4(file, pieceMax) {
+  // ファイル直下の箱を順に見て moov だけ読む（音声本体は読まない）
+  let pos = 0, moov = null;
+  while (pos + 8 <= file.size) {
+    const h = new DataView(await file.slice(pos, pos + 16).arrayBuffer());
+    let size = h.getUint32(0), hdr = 8;
+    const type = str4(h, 4);
+    if (size === 1) { size = Number(h.getBigUint64(8)); hdr = 16; }
+    else if (size === 0) size = file.size - pos;
+    if (size < hdr) break;
+    if (type === 'moov') { moov = new DataView(await file.slice(pos + hdr, pos + size).arrayBuffer()); break; }
+    pos += size;
+  }
+  if (!moov) throw new Error('moov がありません');
+  const find = (list, t) => list.find(b => b.type === t);
+
+  let stbl = null, timescale = 0;
+  for (const trak of mp4Kids(moov, 0, moov.byteLength).filter(b => b.type === 'trak')) {
+    const mdia = find(mp4Kids(moov, trak.body, trak.end), 'mdia'); if (!mdia) continue;
+    const mk = mp4Kids(moov, mdia.body, mdia.end);
+    const hdlr = find(mk, 'hdlr');
+    if (!hdlr || str4(moov, hdlr.body + 8) !== 'soun') continue;
+    const mdhd = find(mk, 'mdhd');
+    timescale = moov.getUint32(mdhd.body + (moov.getUint8(mdhd.body) === 1 ? 20 : 12));
+    const minf = find(mk, 'minf');
+    stbl = minf && find(mp4Kids(moov, minf.body, minf.end), 'stbl');
+    break;
+  }
+  if (!stbl || !timescale) throw new Error('音声トラックがありません');
+  const sk = mp4Kids(moov, stbl.body, stbl.end);
+  const stsd = find(sk, 'stsd'), stts = find(sk, 'stts'), stsz = find(sk, 'stsz'), stsc = find(sk, 'stsc');
+  const stco = find(sk, 'stco') || find(sk, 'co64');
+  if (!stsd || !stts || !stsz || !stsc || !stco) throw new Error('サンプル表が足りません');
+
+  const u = p => moov.getUint32(p);
+  const fixed = u(stsz.body + 4), n = u(stsz.body + 8);
+  const sizes = new Uint32Array(n);
+  for (let i = 0; i < n; i++) sizes[i] = fixed || u(stsz.body + 12 + i * 4);
+
+  const durs = new Uint32Array(n);
+  for (let e = 0, k = 0, ne = u(stts.body + 4); e < ne && k < n; e++) {
+    const c = u(stts.body + 8 + e * 8), d = u(stts.body + 12 + e * 8);
+    for (let j = 0; j < c && k < n; j++) durs[k++] = d;
+  }
+
+  const is64 = stco.type === 'co64', nc = u(stco.body + 4);
+  const co = new Float64Array(nc);
+  for (let i = 0; i < nc; i++) co[i] = is64 ? Number(moov.getBigUint64(stco.body + 8 + i * 8)) : u(stco.body + 8 + i * 4);
+
+  const offs = new Float64Array(n);
+  let s = 0;
+  for (let e = 0, ne = u(stsc.body + 4); e < ne; e++) {
+    const first = u(stsc.body + 8 + e * 12), per = u(stsc.body + 12 + e * 12);
+    const next = e + 1 < ne ? u(stsc.body + 8 + (e + 1) * 12) : nc + 1;
+    for (let c = first; c < next && s < n; c++) {
+      let o = co[c - 1];
+      for (let j = 0; j < per && s < n; j++) { offs[s] = o; o += sizes[s]; s++; }
+    }
+  }
+  if (s !== n) throw new Error('サンプルの位置が合いません');
+
+  const stsdBytes = new Uint8Array(moov.buffer, moov.byteOffset + stsd.start, stsd.end - stsd.start).slice();
+  const pieces = [];
+  let a = 0, t = 0;
+  while (a < n) {
+    let b = a, bytes = 0, dur = 0;
+    while (b < n && (b === a || bytes + sizes[b] <= pieceMax)) { bytes += sizes[b]; dur += durs[b]; b++; }
+    const from = a, to = b, total = dur, offset = t / timescale;
+    pieces.push({
+      name: `part${pieces.length + 1}.m4a`, offset, length: total / timescale,
+      make: () => buildM4a(file, stsdBytes, timescale, sizes.subarray(from, to), offs.subarray(from, to), durs.subarray(from, to), total),
+    });
+    t += dur; a = b;
+  }
+  return { pieces, duration: t / timescale };
+}
+
+function mp4Box(type, parts) {
+  const len = 8 + parts.reduce((n, p) => n + p.length, 0);
+  const out = new Uint8Array(len);
+  new DataView(out.buffer).setUint32(0, len);
+  for (let i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
+  let p = 8;
+  for (const x of parts) { out.set(x, p); p += x.length; }
+  return out;
+}
+function be32(list) {
+  const a = new Uint8Array(list.length * 4), dv = new DataView(a.buffer);
+  for (let i = 0; i < list.length; i++) dv.setUint32(i * 4, list[i] >>> 0);
+  return a;
+}
+function be16(list) {
+  const a = new Uint8Array(list.length * 2), dv = new DataView(a.buffer);
+  for (let i = 0; i < list.length; i++) dv.setUint16(i * 2, list[i]);
+  return a;
+}
+const ascii = s => Uint8Array.from(s, c => c.charCodeAt(0));
+const MATRIX = [0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000];
+
+async function buildM4a(file, stsd, ts, sizes, offs, durs, total) {
+  const n = sizes.length;
+  let lo = offs[0], hi = offs[0] + sizes[0], dataLen = 0, contiguous = true;
+  for (let i = 0; i < n; i++) {
+    lo = Math.min(lo, offs[i]); hi = Math.max(hi, offs[i] + sizes[i]); dataLen += sizes[i];
+    if (i && offs[i] !== offs[i - 1] + sizes[i - 1]) contiguous = false;
+  }
+  const src = new Uint8Array(await file.slice(lo, hi).arrayBuffer());
+  let data = src;
+  if (!contiguous || src.length !== dataLen) {
+    data = new Uint8Array(dataLen);
+    for (let i = 0, p = 0; i < n; i++) { data.set(src.subarray(offs[i] - lo, offs[i] - lo + sizes[i]), p); p += sizes[i]; }
+  }
+
+  const runs = [];  // stts: [個数, 長さ, 個数, 長さ, ...]
+  for (let i = 0; i < n; i++) {
+    if (runs.length && runs[runs.length - 1] === durs[i]) runs[runs.length - 2]++;
+    else runs.push(1, durs[i]);
+  }
+  const ftyp = mp4Box('ftyp', [ascii('M4A '), be32([0]), ascii('M4A mp42isom')]);
+  const moovFor = dataStart => mp4Box('moov', [
+    mp4Box('mvhd', [be32([0, 0, 0, ts, total, 0x00010000]), be16([0x0100, 0]), be32([0, 0, ...MATRIX, 0, 0, 0, 0, 0, 0, 2])]),
+    mp4Box('trak', [
+      mp4Box('tkhd', [be32([7, 0, 0, 1, 0, total, 0, 0]), be16([0, 0, 0x0100, 0]), be32([...MATRIX, 0, 0])]),
+      mp4Box('mdia', [
+        mp4Box('mdhd', [be32([0, 0, 0, ts, total]), be16([0x55C4, 0])]),
+        mp4Box('hdlr', [be32([0, 0]), ascii('soun'), be32([0, 0, 0]), ascii('SoundHandler\0')]),
+        mp4Box('minf', [
+          mp4Box('smhd', [be32([0, 0])]),
+          mp4Box('dinf', [mp4Box('dref', [be32([0, 1]), mp4Box('url ', [be32([1])])])]),
+          mp4Box('stbl', [
+            stsd,
+            mp4Box('stts', [be32([0, runs.length / 2]), be32(runs)]),
+            mp4Box('stsc', [be32([0, 1, 1, n, 1])]),
+            mp4Box('stsz', [be32([0, 0, n]), be32(sizes)]),
+            mp4Box('stco', [be32([0, 1, dataStart])]),
+          ]),
+        ]),
+      ]),
+    ]),
+  ]);
+  const moovLen = moovFor(0).length;
+  const moov = moovFor(ftyp.length + moovLen + 8);
+  const mdatHead = new Uint8Array(8);
+  new DataView(mdatHead.buffer).setUint32(0, 8 + dataLen);
+  mdatHead.set(ascii('mdat'), 4);
+  return new Blob([ftyp, moov, mdatHead, data], { type: 'audio/mp4' });
+}
+
+/* mp3 はフレームが独立しているので、そのまま大きさで切る */
+function splitBytes(file, pieceMax) {
+  const out = [];
+  for (let o = 0, k = 1; o < file.size; o += pieceMax, k++) {
+    const from = o;
+    out.push({ name: `part${k}.mp3`, offset: null, make: async () => file.slice(from, from + pieceMax, 'audio/mpeg') });
+  }
+  return out;
+}
+// ---- 音声ファイルの分割（ここまで） ----
+
+/* それ以外は展開して16kHzモノラルのWAVにする（短めの録音向け） */
+async function splitDecoded(file) {
   const buf = await file.arrayBuffer();
   const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   const ctx = new OAC(1, 16000, 16000);
   let audio;
   try { audio = await new Promise((res, rej) => { const q = ctx.decodeAudioData(buf, res, rej); if (q && q.then) q.then(res, rej); }); }
-  catch { throw new Error('この形式の音声は読み込めません。m4a・mp3・wav のファイルを選んでください'); }
+  catch { throw new Error('この形式の音声は読み込めません。ボイスメモの録音（m4a）か、mp3・wav のファイルを選んでください'); }
   const n = audio.length, chs = audio.numberOfChannels, sr = audio.sampleRate;
   let mono = audio.getChannelData(0);
   if (chs > 1) {
@@ -1004,9 +1235,9 @@ async function splitAudio(file) {
   for (let o = 0, k = 1; o < n; o += size, k++) {
     if (n - o < sr / 2 && out.length) break;
     const from = o;
-    out.push({ make: () => toWav(mono.subarray(from, from + size), sr), name: `part${k}.wav`, offset: from / sr });
+    out.push({ name: `part${k}.wav`, offset: from / sr, make: async () => toWav(mono.subarray(from, from + size), sr) });
   }
-  return out;
+  return { pieces: out, duration: n / sr };
 }
 
 function toWav(f, sr) {
@@ -1023,61 +1254,111 @@ function toWav(f, sr) {
 // "Please try again in 1m2.5s" から待ち秒数を取り出す
 function waitSec(msg) {
   const x = /try again in\s*(?:(\d+)h)?(?:(\d+)m(?!s))?(?:([\d.]+)s)?(?:([\d.]+)ms)?/i.exec(msg);
-  if (!x) return 20;
-  return (+x[1] || 0) * 3600 + (+x[2] || 0) * 60 + (+x[3] || 0) + (+x[4] || 0) / 1000 || 20;
+  if (!x) return 30;
+  return (+x[1] || 0) * 3600 + (+x[2] || 0) * 60 + (+x[3] || 0) + (+x[4] || 0) / 1000 || 30;
 }
 
-async function callGroq(blob, name, lang, signal) {
+async function waitWithCountdown(sec, signal, label) {
+  const until = Date.now() + sec * 1000;
+  while (Date.now() < until) {
+    progress(`無料枠の上限に達したため、あと ${fmtClock((until - Date.now()) / 1000 + 1)} 待ってから続けます`);
+    await sleep(1000, signal);
+  }
+  progress(label);
+}
+
+// キーが違うと、大きなファイルの送信中に応答が返らず固まるので、先にキーだけ確かめる
+async function checkKey(signal) {
+  let r;
+  try { r = await fetch(GROQ_MODELS_URL, { headers: { Authorization: 'Bearer ' + prefs.groqKey }, signal }); }
+  catch (e) {
+    if (e.name === 'AbortError') throw e;
+    throw new Error('Groq につながりませんでした。通信状態を確認して、もう一度試してください');
+  }
+  if (r.status === 401 || r.status === 403) throw new Error('APIキーが正しくありません。設定で Groq の APIキーを確かめてください');
+}
+
+async function callGroq(blob, name, lang, prompt, signal, label) {
   for (let attempt = 0; ; attempt++) {
+    if (signal.aborted) throw new DOMException('中止', 'AbortError');
     const fd = new FormData();
     fd.append('file', blob, name);
     fd.append('model', 'whisper-large-v3');
     fd.append('response_format', 'verbose_json');
     fd.append('temperature', '0');
     if (lang) fd.append('language', lang);
-    let r;
-    try { r = await fetch(GROQ_URL, { method: 'POST', headers: { Authorization: 'Bearer ' + prefs.groqKey }, body: fd, signal }); }
-    catch (e) {
-      if (e.name === 'AbortError') throw e;
-      if (attempt < 2) { await sleep(3000, signal); continue; }
-      throw new Error('Groq につながりませんでした。通信状態を確認してください');
+    if (prompt) fd.append('prompt', prompt);
+    // 通信が途中で止まったときに待ち続けないよう、1回の送信に上限時間を設ける
+    const tc = new AbortController();
+    const relay = () => tc.abort();
+    signal.addEventListener('abort', relay, { once: true });
+    const timer = setTimeout(() => tc.abort(), SEND_TIMEOUT);
+    let r, body = null;
+    try {
+      r = await fetch(GROQ_URL, { method: 'POST', headers: { Authorization: 'Bearer ' + prefs.groqKey }, body: fd, signal: tc.signal });
+      body = await r.json().catch(() => null);
+    } catch (e) {
+      if (signal.aborted) throw new DOMException('中止', 'AbortError');
+      if (attempt < 3) { await sleep(3000 * (attempt + 1), signal); continue; }
+      throw new Error('Groq との通信が途中で止まりました。Wi-Fi など安定した通信で、もう一度試してください');
+    } finally {
+      clearTimeout(timer);
+      signal.removeEventListener('abort', relay);
     }
-    if (r.ok) return r.json();
-    let msg = '';
-    try { msg = (await r.json()).error?.message || ''; } catch {}
-    if (r.status === 401) throw new Error('APIキーが正しくありません。「設定」で Groq の APIキーを確かめてください');
+    if (r.ok && body) return body;
+    const msg = body?.error?.message || '';
+    if (r.status === 401) throw new Error('APIキーが正しくありません。設定で Groq の APIキーを確かめてください');
     if (r.status === 413) throw new Error('ファイルが大きすぎて送れませんでした');
     if (r.status === 429) {
       const w = waitSec(msg);
-      if (attempt < 3 && w <= 90) { progress(`無料枠の上限に達したので ${Math.ceil(w)} 秒待っています…`); await sleep(w * 1000 + 500, signal); continue; }
-      throw new Error('Groq の無料枠をいったん使い切りました。しばらく時間をおいてから、もう一度試してください');
+      if (attempt < 4 && w <= 20 * 60) { await waitWithCountdown(w + 1, signal, label); continue; }
+      throw new Error('Groq の無料枠（1日8時間分）を使い切りました。明日になってから、もう一度試してください');
     }
-    if (r.status >= 500 && attempt < 2) { await sleep(3000, signal); continue; }
+    if (r.status >= 500 && attempt < 3) { await sleep(3000 * (attempt + 1), signal); continue; }
     throw new Error(`文字起こしに失敗しました（${r.status}${msg ? '：' + msg : ''}）`);
   }
+}
+
+async function planPieces(file) {
+  const kind = await sniff(file);
+  const ext = { mp4: 'm4a', mp3: 'mp3', wav: 'wav' }[kind];
+  if (file.size <= SEND_MAX && (SEND_EXT.test(file.name) || ext)) {
+    const name = SEND_EXT.test(file.name) ? file.name : `audio.${ext}`;
+    return { pieces: [{ name, offset: 0, make: async () => file }], duration: null };
+  }
+  if (kind === 'mp4') { try { return await splitMp4(file, PIECE_MAX); } catch {} }
+  if (kind === 'mp3') return { pieces: splitBytes(file, PIECE_MAX), duration: null };
+  return splitDecoded(file);
 }
 
 async function transcribeFile(file) {
   const ac = new AbortController();
   importing = ac;
-  el.impIntro.hidden = true; el.impProg.hidden = false; el.impClose.disabled = true;
-  progress('準備しています…', 0);
+  showProgress();
+  openSheet(el.imp);
   requestWake();
   const s = blank();
   s.title = file.name.replace(/\.[^.]+$/, '');
   s.lang = prefs.lang;
+  s.source = 'file';
   const lang = prefs.lang.slice(0, 2);
   let failed = null;
   try {
-    let pieces;
-    if (file.size <= SEND_MAX && SEND_EXT.test(file.name)) pieces = [{ make: () => file, name: file.name, offset: 0 }];
-    else { progress('長い録音なので分けています…', 0.02); pieces = await splitAudio(file); }
-    let prev = '';
+    progress('準備しています…', 0.01);
+    await checkKey(ac.signal);
+    progress('録音を読み込んでいます…', 0.02);
+    const { pieces, duration } = await planPieces(file);
+    if (duration) el.progInfo.textContent = `${fmtLength(duration)}の録音`;
+    let base = 0, prev = '';
     for (let i = 0; i < pieces.length; i++) {
       const p = pieces[i];
       const label = pieces.length > 1 ? `文字にしています（${i + 1} / ${pieces.length}）` : '文字にしています…';
-      progress(label, (i + 0.1) / pieces.length);
-      const res = await callGroq(p.make(), p.name, lang, ac.signal);
+      progress(label, (i + 0.15) / pieces.length);
+      const offset = p.offset ?? base;
+      const blob = await p.make();
+      // 前の部分の終わりを渡すと、つなぎ目の言葉がつながりやすい
+      const prompt = s.segs.slice(-3).map(g => g.text).join('').slice(-120);
+      const res = await callGroq(blob, p.name, lang, prompt, ac.signal, label);
       const segs = res.segments || (res.text ? [{ start: 0, text: res.text }] : []);
       for (const g of segs) {
         // 無音部分でWhisperが作りがちな架空の文を捨てる
@@ -1085,9 +1366,10 @@ async function transcribeFile(file) {
         const text = tidy(g.text, s.lang, false);
         if (!text || text === prev) continue;
         prev = text;
-        s.segs.push({ t: p.offset + (g.start || 0), text });
+        s.segs.push({ t: offset + (g.start || 0), text });
       }
-      s.duration = Math.max(s.duration, p.offset + (res.duration || 0));
+      base = offset + (res.duration || p.length || 0);
+      s.duration = Math.max(s.duration, base);
       progress(label, (i + 1) / pieces.length);
     }
     if (!s.segs.length) throw new Error('声が見つかりませんでした。別のファイルで試してください');
@@ -1098,17 +1380,17 @@ async function transcribeFile(file) {
     releaseWake();
   }
 
-  if (failed && failed.name === 'AbortError' && !s.segs.length) { showImportIntro(); closeSheet(el.imp); toast('文字起こしを中止しました'); return; }
+  if (failed && failed.name === 'AbortError' && !s.segs.length) { closeSheet(el.imp); toast('文字起こしを中止しました'); return; }
   if (s.segs.length) {
     if (!cur.segs.length && !cur.title.trim()) sessions = sessions.filter(x => x !== cur);
     cur = s; s.updatedAt = Date.now(); ensureListed();
     dirty = true; saveNow();
     renderAll(); el.scroller.scrollTop = 0;
-    showImportIntro(); closeSheet(el.imp);
+    closeSheet(el.imp);
     toast(failed ? `途中まで（${nf.format(charCount(s))}文字）保存しました。${failed.name === 'AbortError' ? '' : failed.message}` : `${nf.format(charCount(s))}文字の文字起こしができました`);
     return;
   }
-  showImportIntro(failed.message || '文字起こしに失敗しました', true);
+  showImportError(failed.message || '文字起こしに失敗しました');
 }
 
 /* ---------- 通知 ---------- */
@@ -1125,18 +1407,11 @@ if ('ResizeObserver' in window) new ResizeObserver(setDockH).observe(el.dock);
 setDockH();
 
 /* ---------- 起動 ---------- */
-function envNotice() {
-  if (!SR) {
-    return IN_APP
-      ? 'LINE などアプリ内のブラウザでは、その場の文字起こしは使えません。メニューから「ブラウザで開く」を選んでください。'
-      : 'このブラウザでは、その場の文字起こしは使えません。Android は Chrome、iPhone は Safari で開いてください。録音ファイルからの文字起こしは使えます。';
-  }
-  if (!window.isSecureContext) return 'マイクを使うには https:// で始まるアドレスで開く必要があります。';
-  return '';
+if (IN_APP) {
+  el.noticeText.textContent = 'LINE などアプリ内のブラウザではうまく動かないことがあります。メニューから「ブラウザで開く」を選んでください。';
+  el.notice.hidden = false;
 }
-const note = envNotice();
-if (note) { el.noticeText.textContent = note; el.notice.hidden = false; }
-if (!SR || !window.isSecureContext) el.rec.disabled = true;
+if (!SR || !window.isSecureContext) el.rec.hidden = true;
 
 renderAll();
 
