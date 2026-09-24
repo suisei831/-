@@ -1,5 +1,5 @@
 // アプリ本体をキャッシュして、電波が弱くても画面を開けるようにする
-const CACHE = 'koekaki-v2';
+const CACHE = 'koekaki-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -14,18 +14,29 @@ self.addEventListener('activate', e => {
   );
 });
 
-// キャッシュを先に返しつつ裏で更新（stale-while-revalidate）
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  const cacheable = url.origin === location.origin || /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
-  if (!cacheable) return;
+  if (url.origin !== location.origin) return;
+
+  // ページ本体はネットを優先し、更新がすぐ届くようにする（圏外ならキャッシュ）
+  if (req.mode === 'navigate') {
+    e.respondWith(
+      fetch(req).then(res => {
+        if (res.ok) caches.open(CACHE).then(c => c.put('./', res.clone()));
+        return res;
+      }).catch(() => caches.match('./', { ignoreSearch: true }))
+    );
+    return;
+  }
+
+  // アイコンなどはキャッシュを先に返しつつ裏で更新
   e.respondWith(
     caches.open(CACHE).then(async cache => {
-      const hit = await cache.match(req, { ignoreSearch: url.origin === location.origin });
+      const hit = await cache.match(req, { ignoreSearch: true });
       const net = fetch(req).then(res => {
-        if (res.ok || res.type === 'opaque') cache.put(req, res.clone());
+        if (res.ok) cache.put(req, res.clone());
         return res;
       }).catch(() => hit);
       return hit || net;
